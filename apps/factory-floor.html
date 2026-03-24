@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Factory Floor — Roman's Lab</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -17,8 +17,8 @@ body {
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .back { position: absolute; top: 1rem; left: 1rem; color: #6366f1; text-decoration: none; font-size: .85rem; z-index: 10; }
@@ -69,6 +69,12 @@ canvas {
   cursor: pointer;
 }
 
+.hint-bar {
+  margin-top: .4rem; font-size: .7rem; color: #5d7da3;
+  text-align: center; padding: .2rem .5rem;
+}
+.hint-bar strong { color: #6366f1; }
+
 /* Toolbar */
 .toolbar {
   display: flex; align-items: center; gap: .4rem; padding: .6rem;
@@ -76,43 +82,56 @@ canvas {
 }
 .tool-btn {
   background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.1);
-  border-radius: 8px; padding: .4rem .6rem; color: #8a9dba; font-size: .75rem;
+  border-radius: 8px; padding: .5rem .7rem; color: #8a9dba; font-size: .8rem;
   font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
   display: flex; align-items: center; gap: .3rem;
+  -webkit-tap-highlight-color: transparent;
 }
 .tool-btn:hover { border-color: rgba(99,102,241,0.4); color: #e4eaf4; }
-.tool-btn.active { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.12); }
-.tool-btn.locked { opacity: 0.3; pointer-events: none; }
+.tool-btn.active { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.15); box-shadow: 0 0 12px rgba(99,102,241,0.15); }
+.tool-btn.locked { opacity: 0.25; pointer-events: none; }
 
-.tool-btn.run-btn { background: rgba(46,204,113,0.12); border-color: rgba(46,204,113,0.3); color: #2ecc71; }
+.tool-btn.run-btn { background: rgba(46,204,113,0.15); border-color: rgba(46,204,113,0.4); color: #2ecc71; font-size: .85rem; }
 .tool-btn.run-btn:hover { border-color: rgba(46,204,113,0.6); }
-.tool-btn.run-btn.running { background: rgba(243,156,18,0.12); border-color: rgba(243,156,18,0.3); color: #f39c12; }
+.tool-btn.run-btn.running { background: rgba(243,156,18,0.15); border-color: rgba(243,156,18,0.4); color: #f39c12; }
 .tool-btn.reset-btn { background: rgba(231,76,60,0.08); border-color: rgba(231,76,60,0.2); color: #e74c3c; }
 
-.sep { width: 1px; height: 20px; background: rgba(255,255,255,0.08); margin: 0 .2rem; }
+.sep { width: 1px; height: 24px; background: rgba(255,255,255,0.08); margin: 0 .2rem; }
 
 /* Level select overlay */
 .overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(5,5,15,0.92); display: flex; align-items: center; justify-content: center;
-  z-index: 100; backdrop-filter: blur(8px);
+  background: rgba(5,5,15,0.95); display: flex; align-items: center; justify-content: center;
+  z-index: 100;
 }
 .overlay.hidden { display: none; }
 .level-select {
-  max-width: 500px; width: 90%; text-align: center;
+  max-width: 520px; width: 92%; text-align: center;
 }
 .level-select h2 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: .3rem; }
-.level-select .sub { color: #7a92b5; font-size: .85rem; margin-bottom: 1.5rem; }
+.level-select .sub { color: #7a92b5; font-size: .85rem; margin-bottom: 1rem; }
+
+.how-to-play {
+  background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; text-align: left;
+}
+.how-to-play h3 { font-size: .75rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .5rem; }
+.how-to-play ol { padding-left: 1.2rem; }
+.how-to-play li { font-size: .8rem; color: #94a7c8; line-height: 1.6; margin-bottom: .2rem; }
+.how-to-play li strong { color: #e4eaf4; }
+
 .level-grid {
   display: grid; grid-template-columns: repeat(5, 1fr); gap: .6rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 .level-btn {
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px; padding: .8rem .4rem; cursor: pointer;
   font-family: inherit; color: #e4eaf4; transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
 }
 .level-btn:hover:not(.locked) { border-color: rgba(99,102,241,0.5); transform: translateY(-2px); }
+.level-btn:active:not(.locked) { transform: translateY(0); background: rgba(99,102,241,0.12); }
 .level-btn.locked { opacity: 0.25; cursor: default; }
 .level-btn .num { font-size: 1.1rem; font-weight: 800; color: #6366f1; }
 .level-btn .stars { font-size: .7rem; color: #f39c12; margin-top: .2rem; }
@@ -120,7 +139,7 @@ canvas {
 
 /* Complete overlay */
 .complete-box {
-  background: rgba(15,15,26,0.95); border: 1px solid rgba(99,102,241,0.3);
+  background: rgba(15,15,26,0.98); border: 1px solid rgba(99,102,241,0.3);
   border-radius: 14px; padding: 2rem; max-width: 360px; width: 90%; text-align: center;
 }
 .complete-box h2 { font-size: 1.3rem; color: #fff; margin-bottom: .5rem; }
@@ -132,13 +151,14 @@ canvas {
   padding: .5rem 1.2rem; border-radius: 8px; border: 1px solid rgba(99,102,241,0.3);
   background: rgba(99,102,241,0.12); color: #6366f1; font-weight: 600;
   font-family: inherit; cursor: pointer; font-size: .85rem;
+  -webkit-tap-highlight-color: transparent;
 }
 .complete-box .btn.primary { background: #6366f1; color: #fff; border-color: #6366f1; }
 </style>
 </head>
 <body>
 
-<a href="../index.html" class="back">← Lab</a>
+<a href="../index.html" class="back">&larr; Lab</a>
 
 <div class="header">
   <div class="badge">Puzzle Game</div>
@@ -149,34 +169,45 @@ canvas {
 <div class="hud">
   <div class="hud-card"><div class="label">Level</div><div class="value" id="hud-level">1</div></div>
   <div class="hud-card"><div class="label">Score</div><div class="value" id="hud-score">0</div></div>
-  <div class="hud-card"><div class="label">Efficiency</div><div class="value green" id="hud-eff">—</div></div>
+  <div class="hud-card"><div class="label">Efficiency</div><div class="value green" id="hud-eff">&mdash;</div></div>
   <div class="hud-card"><div class="label">Delivered</div><div class="value" id="hud-del">0/0</div></div>
-  <div class="hud-card"><div class="label">Rating</div><div class="value amber" id="hud-stars">☆☆☆</div></div>
+  <div class="hud-card"><div class="label">Rating</div><div class="value amber" id="hud-stars">&star;&star;&star;</div></div>
 </div>
 
 <div class="game-area">
   <canvas id="c"></canvas>
+  <div class="hint-bar" id="hint-bar">Select <strong>Belt</strong> below, then tap the grid to place. Tap again to rotate. Hit <strong>Run</strong> when ready.</div>
 </div>
 
 <div class="toolbar" id="toolbar">
-  <button class="tool-btn active" data-tool="belt" title="Conveyor Belt (1)">→ Belt</button>
-  <button class="tool-btn" data-tool="splitter" title="Splitter (2)">⟐ Split</button>
-  <button class="tool-btn" data-tool="processor" title="Processor (3)">⚙ Process</button>
-  <button class="tool-btn locked" data-tool="sorter" title="Sorter (4)">⊕ Sort</button>
-  <button class="tool-btn locked" data-tool="filter" title="Filter (5)">✕ Filter</button>
-  <button class="tool-btn locked" data-tool="booster" title="Booster (6)">⚡ Boost</button>
+  <button class="tool-btn active" data-tool="belt" title="Conveyor Belt (1)"><span style="color:#6366f1">&#x2192;</span> Belt</button>
+  <button class="tool-btn" data-tool="splitter" title="Splitter (2)"><span style="color:#a855f7">Y</span> Split</button>
+  <button class="tool-btn" data-tool="processor" title="Processor (3)"><span style="color:#2ecc71">&#x2699;</span> Process</button>
+  <button class="tool-btn locked" data-tool="sorter" title="Sorter (4)"><span style="color:#fbbf24">&#x2295;</span> Sort</button>
+  <button class="tool-btn locked" data-tool="filter" title="Filter (5)"><span style="color:#ef4444">&#x2717;</span> Filter</button>
+  <button class="tool-btn locked" data-tool="booster" title="Booster (6)"><span style="color:#3b82f6">&#x26A1;</span> Boost</button>
   <div class="sep"></div>
-  <button class="tool-btn" data-tool="erase" title="Erase (E)">🗑</button>
+  <button class="tool-btn" data-tool="erase" title="Erase (E)">&#x1F5D1;</button>
   <div class="sep"></div>
-  <button class="tool-btn run-btn" id="run-btn" title="Run / Pause (Space)">▶ Run</button>
-  <button class="tool-btn reset-btn" id="reset-btn" title="Reset (R)">↺ Reset</button>
+  <button class="tool-btn run-btn" id="run-btn" title="Run / Pause (Space)">&#x25B6; Run</button>
+  <button class="tool-btn reset-btn" id="reset-btn" title="Reset (R)">&#x21BA; Reset</button>
 </div>
 
 <!-- Level Select -->
 <div class="overlay" id="level-overlay">
   <div class="level-select">
     <h2>Factory Floor</h2>
-    <div class="sub">Route products from input to output. Build the perfect line.</div>
+    <div class="sub">Build conveyor lines to route products from inputs to outputs.</div>
+    <div class="how-to-play">
+      <h3>How to play</h3>
+      <ol>
+        <li><strong>Pick a level</strong> below to start</li>
+        <li><strong>Place belts</strong> on the grid &mdash; tap to place, tap same piece to rotate</li>
+        <li>Connect the <strong style="color:#2ecc71">green inputs</strong> (left) to the matching <strong style="color:#6366f1">colored outputs</strong> (right)</li>
+        <li>Hit <strong style="color:#2ecc71">Run</strong> and watch your products flow</li>
+        <li>Deliver products to the <strong>correct color bay</strong> to score points</li>
+      </ol>
+    </div>
     <div class="level-grid" id="level-grid"></div>
   </div>
 </div>
@@ -185,150 +216,170 @@ canvas {
 <div class="overlay hidden" id="complete-overlay">
   <div class="complete-box">
     <h2 id="complete-title">Level Complete!</h2>
-    <div class="stars-big" id="complete-stars">★★★</div>
+    <div class="stars-big" id="complete-stars">&star;&star;&star;</div>
     <div class="stat">Score: <strong id="complete-score">0</strong></div>
     <div class="stat">Efficiency: <strong id="complete-eff">0%</strong></div>
     <div class="stat">Delivered: <strong id="complete-del">0/0</strong></div>
     <div class="btns">
       <button class="btn" id="btn-retry">Retry</button>
       <button class="btn" id="btn-levels">Levels</button>
-      <button class="btn primary" id="btn-next">Next →</button>
+      <button class="btn primary" id="btn-next">Next &rarr;</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
+// =====================================================
 // FACTORY FLOOR — Conveyor Puzzle Game
-// ═══════════════════════════════════════════════════════════
+// =====================================================
 
-// ── Audio ──────────────────────────────────────────────────
-const AC = new (window.AudioContext || window.webkitAudioContext)();
-function tone(freq, type, dur, vol = 0.2) {
+// ── Audio ────────────────────────────────────────────
+let AC = null;
+function getAC() {
+  if (!AC) {
+    try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  if (AC && AC.state === 'suspended') AC.resume();
+  return AC;
+}
+
+function tone(freq, type, dur, vol) {
+  vol = vol || 0.2;
   try {
-    const g = AC.createGain(), o = AC.createOscillator();
+    var ac = getAC(); if (!ac) return;
+    var g = ac.createGain(), o = ac.createOscillator();
     o.type = type; o.frequency.value = freq;
-    g.gain.setValueAtTime(vol, AC.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + dur);
-    o.connect(g); g.connect(AC.destination);
-    o.start(); o.stop(AC.currentTime + dur);
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime + dur);
   } catch(e) {}
 }
-function sfxDeliver() { tone(523, 'sine', .15); setTimeout(() => tone(659, 'sine', .15), 80); setTimeout(() => tone(784, 'sine', .2), 160); }
-function sfxDefect() { tone(200, 'square', .15); tone(150, 'square', .15); }
-function sfxPlace() { tone(440, 'sine', .06); }
-function sfxRotate() { tone(600, 'sine', .04); }
-function sfxComplete() { [523,659,784,1047].forEach((f,i) => setTimeout(() => tone(f,'sine',.2,.15), i*100)); }
-function sfxLost() { tone(300, 'sawtooth', .12); }
+function sfxDeliver() { tone(523,'sine',.15); setTimeout(function(){tone(659,'sine',.15)},80); setTimeout(function(){tone(784,'sine',.2)},160); }
+function sfxDefect() { tone(200,'square',.15); tone(150,'square',.15); }
+function sfxPlace() { tone(440,'sine',.06); }
+function sfxRotate() { tone(600,'sine',.04); }
+function sfxComplete() { [523,659,784,1047].forEach(function(f,i){setTimeout(function(){tone(f,'sine',.2,.15)},i*100)}); }
+function sfxLost() { tone(300,'sawtooth',.12); }
 
-// ── Constants ──────────────────────────────────────────────
-const COLS = 12, ROWS = 8;
-const MAXW = Math.min(window.innerWidth - 16, 720);
-const CELL = Math.floor(MAXW / COLS);
-const W = COLS * CELL, H = ROWS * CELL;
+// ── Constants ────────────────────────────────────────
+var COLS = 12, ROWS = 8;
+var MAXW = Math.min(window.innerWidth - 20, 700);
+var CELL = Math.floor(MAXW / COLS);
+var W = COLS * CELL, H = ROWS * CELL;
 
-const canvas = document.getElementById('c');
+var canvas = document.getElementById('c');
 canvas.width = W; canvas.height = H;
-const ctx = canvas.getContext('2d');
+var ctx = canvas.getContext('2d');
 
-const DIRS = { right: {x:1,y:0}, left: {x:-1,y:0}, up: {x:0,y:-1}, down: {x:0,y:1} };
-const DIR_ORDER = ['right','down','left','up'];
+var DIRS = { right:{x:1,y:0}, left:{x:-1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1} };
+var DIR_ORDER = ['right','down','left','up'];
 function nextDirName(d) { return DIR_ORDER[(DIR_ORDER.indexOf(d)+1)%4]; }
 
-const COLORS = {
-  blue:   { fill: '#4f8cff', glow: 'rgba(79,140,255,0.4)', name: 'Blue' },
-  orange: { fill: '#ff8c42', glow: 'rgba(255,140,66,0.4)', name: 'Orange' },
-  green:  { fill: '#2ecc71', glow: 'rgba(46,204,113,0.4)', name: 'Green' },
-  purple: { fill: '#a855f7', glow: 'rgba(168,85,247,0.4)', name: 'Purple' },
-  red:    { fill: '#ef4444', glow: 'rgba(239,68,68,0.4)',   name: 'Red' },
-  raw:    { fill: '#888', glow: 'rgba(136,136,136,0.3)', name: 'Raw' },
+var COLORS = {
+  blue:   { fill:'#4f8cff', glow:'rgba(79,140,255,0.4)' },
+  orange: { fill:'#ff8c42', glow:'rgba(255,140,66,0.4)' },
+  green:  { fill:'#2ecc71', glow:'rgba(46,204,113,0.4)' },
+  purple: { fill:'#a855f7', glow:'rgba(168,85,247,0.4)' },
+  raw:    { fill:'#888',    glow:'rgba(136,136,136,0.3)' },
 };
 
-// ── Level Definitions ──────────────────────────────────────
-const LEVELS = [
+// ── Level Definitions ────────────────────────────────
+var LEVELS = [
   {
-    name: 'First Line', inputs: [{x:0,y:3,color:'blue'}], outputs: [{x:11,y:3,color:'blue'}],
-    products: 8, tickMs: 700, pieces: ['belt'], defectRate: 0,
+    name:'First Line', inputs:[{x:0,y:3,color:'blue'}], outputs:[{x:11,y:3,color:'blue'}],
+    products:8, tickMs:700, pieces:['belt'], defectRate:0,
+    hint:'Place belts across row 4 to connect input to output, then hit Run.'
   },
   {
-    name: 'Two Lanes', inputs: [{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
-    outputs: [{x:11,y:2,color:'blue'},{x:11,y:5,color:'orange'}],
-    products: 12, tickMs: 650, pieces: ['belt'], defectRate: 0,
+    name:'Two Lanes', inputs:[{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
+    outputs:[{x:11,y:2,color:'blue'},{x:11,y:5,color:'orange'}],
+    products:12, tickMs:650, pieces:['belt'], defectRate:0,
+    hint:'Build two parallel belt lines — blue to blue, orange to orange.'
   },
   {
-    name: 'The Split',
-    inputs: [{x:0,y:3,color:'blue'}],
-    outputs: [{x:11,y:1,color:'blue'},{x:11,y:5,color:'orange'}],
-    products: 12, tickMs: 650, pieces: ['belt','splitter'], defectRate: 0,
-    processBlueToOrange: true,
+    name:'The Split',
+    inputs:[{x:0,y:3,color:'blue'}],
+    outputs:[{x:11,y:1,color:'blue'},{x:11,y:5,color:'orange'}],
+    products:12, tickMs:650, pieces:['belt','splitter'], defectRate:0,
+    hint:'Use a Splitter to fork the line. Tap a splitter to rotate its split direction.'
   },
   {
-    name: 'Processing', inputs: [{x:0,y:3,color:'raw'}],
-    outputs: [{x:11,y:3,color:'blue'}],
-    products: 10, tickMs: 700, pieces: ['belt','processor'], defectRate: 0,
+    name:'Processing', inputs:[{x:0,y:3,color:'raw'}],
+    outputs:[{x:11,y:3,color:'blue'}],
+    products:10, tickMs:700, pieces:['belt','processor'], defectRate:0,
+    hint:'Raw (gray) products must pass through a Processor to become blue.'
   },
   {
-    name: 'Sort Line',
-    inputs: [{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
-    outputs: [{x:11,y:2,color:'orange'},{x:11,y:5,color:'blue'}],
-    products: 14, tickMs: 600, pieces: ['belt','splitter'], defectRate: 0,
+    name:'Sort Line',
+    inputs:[{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
+    outputs:[{x:11,y:2,color:'orange'},{x:11,y:5,color:'blue'}],
+    products:14, tickMs:600, pieces:['belt','splitter'], defectRate:0,
+    hint:'Outputs are swapped! Use splitters and vertical belts to cross the streams.'
   },
   {
-    name: 'Full Mix',
-    inputs: [{x:0,y:1,color:'raw'},{x:0,y:4,color:'raw'},{x:0,y:6,color:'raw'}],
-    outputs: [{x:11,y:1,color:'blue'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'green'}],
-    products: 15, tickMs: 600, pieces: ['belt','splitter','processor','sorter'], defectRate: 0,
+    name:'Full Mix',
+    inputs:[{x:0,y:1,color:'raw'},{x:0,y:4,color:'raw'},{x:0,y:6,color:'raw'}],
+    outputs:[{x:11,y:1,color:'blue'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'green'}],
+    products:15, tickMs:600, pieces:['belt','splitter','processor','sorter'], defectRate:0,
+    hint:'Sorters auto-route products toward their matching output bay.'
   },
   {
-    name: 'Quality Gate',
-    inputs: [{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
-    outputs: [{x:11,y:2,color:'blue'},{x:11,y:5,color:'orange'}],
-    products: 16, tickMs: 550, pieces: ['belt','splitter','processor','sorter','filter'], defectRate: 0.2,
+    name:'Quality Gate',
+    inputs:[{x:0,y:2,color:'blue'},{x:0,y:5,color:'orange'}],
+    outputs:[{x:11,y:2,color:'blue'},{x:11,y:5,color:'orange'}],
+    products:16, tickMs:550, pieces:['belt','splitter','processor','sorter','filter'], defectRate:0.2,
+    hint:'Some products are defective (red X). Place Filters to catch them before output.'
   },
   {
-    name: 'Overdrive',
-    inputs: [{x:0,y:1,color:'blue'},{x:0,y:4,color:'orange'},{x:0,y:6,color:'green'}],
-    outputs: [{x:11,y:1,color:'blue'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'green'}],
-    products: 20, tickMs: 450, pieces: ['belt','splitter','processor','sorter','filter','booster'], defectRate: 0.15,
+    name:'Overdrive',
+    inputs:[{x:0,y:1,color:'blue'},{x:0,y:4,color:'orange'},{x:0,y:6,color:'green'}],
+    outputs:[{x:11,y:1,color:'blue'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'green'}],
+    products:20, tickMs:450, pieces:['belt','splitter','processor','sorter','filter','booster'], defectRate:0.15,
+    hint:'Boosters jump products 2 cells forward. Use them to speed up long runs.'
   },
   {
-    name: 'Precision',
-    inputs: [{x:0,y:1,color:'raw'},{x:0,y:3,color:'raw'},{x:0,y:5,color:'raw'},{x:0,y:7,color:'raw'}],
-    outputs: [{x:11,y:0,color:'blue'},{x:11,y:2,color:'orange'},{x:11,y:5,color:'green'},{x:11,y:7,color:'purple'}],
-    products: 24, tickMs: 450, pieces: ['belt','splitter','processor','sorter','filter','booster'], defectRate: 0.15,
+    name:'Precision',
+    inputs:[{x:0,y:1,color:'raw'},{x:0,y:3,color:'raw'},{x:0,y:5,color:'raw'},{x:0,y:7,color:'raw'}],
+    outputs:[{x:11,y:0,color:'blue'},{x:11,y:2,color:'orange'},{x:11,y:5,color:'green'},{x:11,y:7,color:'purple'}],
+    products:24, tickMs:450, pieces:['belt','splitter','processor','sorter','filter','booster'], defectRate:0.15,
+    hint:'Four inputs, four outputs, all raw. Process and sort carefully.'
   },
   {
-    name: 'Lights Out',
-    inputs: [{x:0,y:0,color:'raw'},{x:0,y:2,color:'blue'},{x:0,y:4,color:'raw'},{x:0,y:6,color:'orange'}],
-    outputs: [{x:11,y:0,color:'blue'},{x:11,y:2,color:'green'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'purple'}],
-    products: 30, tickMs: 380, pieces: ['belt','splitter','processor','sorter','filter','booster'], defectRate: 0.2,
+    name:'Lights Out',
+    inputs:[{x:0,y:0,color:'raw'},{x:0,y:2,color:'blue'},{x:0,y:4,color:'raw'},{x:0,y:6,color:'orange'}],
+    outputs:[{x:11,y:0,color:'blue'},{x:11,y:2,color:'green'},{x:11,y:4,color:'orange'},{x:11,y:6,color:'purple'}],
+    products:30, tickMs:380, pieces:['belt','splitter','processor','sorter','filter','booster'], defectRate:0.2,
+    hint:'The final challenge. Mixed inputs, mismatched outputs, defects everywhere.'
   },
 ];
 
-// ── State ──────────────────────────────────────────────────
-let grid = [];        // grid[y][x] = { type, dir, ... } or null
-let products = [];    // { x, y, color, defective, animX, animY, processing, processTicks }
-let particles = [];
-let currentLevel = 0;
-let score = 0;
-let delivered = 0;
-let lost = 0;
-let totalSpawned = 0;
-let running = false;
-let tickTimer = null;
-let selectedTool = 'belt';
-let levelStars = JSON.parse(localStorage.getItem('ffStars') || '{}');
-let spawnQueue = 0;
-let spawnIndex = 0;
-let levelComplete = false;
-let animFrame = 0;
+// ── State ────────────────────────────────────────────
+var grid = [];
+var products = [];
+var particles = [];
+var currentLevel = 0;
+var score = 0;
+var delivered = 0;
+var lost = 0;
+var totalSpawned = 0;
+var running = false;
+var tickTimer = null;
+var selectedTool = 'belt';
+var levelStars = {};
+try { levelStars = JSON.parse(localStorage.getItem('ffStars') || '{}'); } catch(e) {}
+var spawnQueue = 0;
+var spawnIndex = 0;
+var levelComplete = false;
+var animFrame = 0;
+var tickCount = 0;
 
-// ── Grid Helpers ───────────────────────────────────────────
+// ── Grid Helpers ─────────────────────────────────────
 function initGrid() {
   grid = [];
-  for (let y = 0; y < ROWS; y++) {
+  for (var y = 0; y < ROWS; y++) {
     grid[y] = [];
-    for (let x = 0; x < COLS; x++) grid[y][x] = null;
+    for (var x = 0; x < COLS; x++) grid[y][x] = null;
   }
   products = [];
   particles = [];
@@ -337,6 +388,7 @@ function initGrid() {
   totalSpawned = 0;
   spawnQueue = 0;
   spawnIndex = 0;
+  tickCount = 0;
   score = 0;
   levelComplete = false;
   running = false;
@@ -346,9 +398,9 @@ function initGrid() {
 function inBounds(x, y) { return x >= 0 && x < COLS && y >= 0 && y < ROWS; }
 
 function isInputOrOutput(x, y) {
-  const lv = LEVELS[currentLevel];
-  if (lv.inputs.some(i => i.x === x && i.y === y)) return true;
-  if (lv.outputs.some(o => o.x === x && o.y === y)) return true;
+  var lv = LEVELS[currentLevel];
+  for (var i = 0; i < lv.inputs.length; i++) { if (lv.inputs[i].x === x && lv.inputs[i].y === y) return true; }
+  for (var i = 0; i < lv.outputs.length; i++) { if (lv.outputs[i].x === x && lv.outputs[i].y === y) return true; }
   return false;
 }
 
@@ -356,10 +408,10 @@ function canPlace(x, y) {
   return inBounds(x, y) && !grid[y][x] && !isInputOrOutput(x, y);
 }
 
-// ── Piece Placement ────────────────────────────────────────
+// ── Piece Placement ──────────────────────────────────
 function placePiece(x, y) {
   if (running) return;
-  const lv = LEVELS[currentLevel];
+  var lv = LEVELS[currentLevel];
 
   if (selectedTool === 'erase') {
     if (grid[y][x] && !isInputOrOutput(x, y)) {
@@ -369,28 +421,67 @@ function placePiece(x, y) {
     return;
   }
 
-  // If cell already has a piece of the same type, rotate it
+  // Rotate if same type
   if (grid[y][x] && grid[y][x].type === selectedTool) {
     grid[y][x].dir = nextDirName(grid[y][x].dir);
     sfxRotate();
     return;
   }
 
-  if (!canPlace(x, y)) return;
-  if (!lv.pieces.includes(selectedTool)) return;
+  // Replace if different type
+  if (grid[y][x] && grid[y][x].type !== selectedTool) {
+    if (lv.pieces.indexOf(selectedTool) === -1) return;
+    grid[y][x] = { type: selectedTool, dir: 'right', _count: 0 };
+    sfxPlace();
+    return;
+  }
 
-  grid[y][x] = { type: selectedTool, dir: 'right' };
+  if (!canPlace(x, y)) return;
+  if (lv.pieces.indexOf(selectedTool) === -1) return;
+
+  grid[y][x] = { type: selectedTool, dir: 'right', _count: 0 };
   sfxPlace();
 }
 
-// ── Simulation ─────────────────────────────────────────────
+// ── Canvas Click/Touch ───────────────────────────────
+function getGridPos(e) {
+  var rect = canvas.getBoundingClientRect();
+  var clientX, clientY;
+  if (e.touches && e.touches.length > 0) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  var sx = canvas.width / rect.width;
+  var sy = canvas.height / rect.height;
+  var gx = Math.floor((clientX - rect.left) * sx / CELL);
+  var gy = Math.floor((clientY - rect.top) * sy / CELL);
+  return { x: gx, y: gy };
+}
+
+function handleCanvasInput(e) {
+  e.preventDefault();
+  getAC();
+  var pos = getGridPos(e);
+  if (inBounds(pos.x, pos.y)) placePiece(pos.x, pos.y);
+}
+
+canvas.addEventListener('click', handleCanvasInput);
+canvas.addEventListener('touchstart', handleCanvasInput, { passive: false });
+
+// ── Simulation ───────────────────────────────────────
 function startSim() {
-  if (AC.state === 'suspended') AC.resume();
-  const lv = LEVELS[currentLevel];
+  getAC();
+  var lv = LEVELS[currentLevel];
   running = true;
-  spawnQueue = lv.products;
-  spawnIndex = 0;
-  document.getElementById('run-btn').textContent = '⏸ Pause';
+  if (totalSpawned === 0) {
+    spawnQueue = lv.products;
+    spawnIndex = 0;
+    tickCount = 0;
+  }
+  document.getElementById('run-btn').innerHTML = '&#x23F8; Pause';
   document.getElementById('run-btn').classList.add('running');
   tickTimer = setInterval(simTick, lv.tickMs);
 }
@@ -398,12 +489,13 @@ function startSim() {
 function pauseSim() {
   running = false;
   clearInterval(tickTimer);
-  document.getElementById('run-btn').textContent = '▶ Run';
+  document.getElementById('run-btn').innerHTML = '&#x25B6; Run';
   document.getElementById('run-btn').classList.remove('running');
 }
 
 function resetLevel() {
   pauseSim();
+  // Keep placed pieces, just reset products
   products = [];
   particles = [];
   delivered = 0;
@@ -411,33 +503,48 @@ function resetLevel() {
   totalSpawned = 0;
   spawnQueue = 0;
   spawnIndex = 0;
+  tickCount = 0;
   score = 0;
   levelComplete = false;
+  // Reset splitter counts
+  for (var y = 0; y < ROWS; y++) {
+    for (var x = 0; x < COLS; x++) {
+      if (grid[y][x]) grid[y][x]._count = 0;
+    }
+  }
   updateHUD();
+}
+
+function fullReset() {
+  pauseSim();
+  initGrid();
 }
 
 function simTick() {
   if (levelComplete) return;
-  const lv = LEVELS[currentLevel];
+  var lv = LEVELS[currentLevel];
+  tickCount++;
 
-  // Spawn products
-  if (spawnQueue > 0 && animFrame % 2 === 0) {
-    const inp = lv.inputs[spawnIndex % lv.inputs.length];
-    // Don't spawn if something is already at the input
-    if (!products.some(p => Math.round(p.x) === inp.x && Math.round(p.y) === inp.y)) {
-      let color = inp.color;
-      // For processor levels, raw products need target assignment
-      let targetColor = null;
+  // Spawn products every other tick
+  if (spawnQueue > 0 && tickCount % 2 === 0) {
+    var inp = lv.inputs[spawnIndex % lv.inputs.length];
+    var blocked = false;
+    for (var p = 0; p < products.length; p++) {
+      if (Math.round(products[p].x) === inp.x && Math.round(products[p].y) === inp.y) { blocked = true; break; }
+    }
+    if (!blocked) {
+      var color = inp.color;
+      var targetColor = null;
       if (color === 'raw' && lv.outputs.length > 0) {
-        // Cycle through output colors
-        const outColors = lv.outputs.map(o => o.color);
+        var outColors = [];
+        for (var o = 0; o < lv.outputs.length; o++) outColors.push(lv.outputs[o].color);
         targetColor = outColors[totalSpawned % outColors.length];
       }
-      const defective = lv.defectRate > 0 && Math.random() < lv.defectRate;
+      var defective = lv.defectRate > 0 && Math.random() < lv.defectRate;
       products.push({
-        x: inp.x, y: inp.y, color, targetColor,
-        defective, animX: inp.x * CELL, animY: inp.y * CELL,
-        processing: false, processTicks: 0, moved: false,
+        x: inp.x, y: inp.y, color: color, targetColor: targetColor,
+        defective: defective, animX: inp.x * CELL, animY: inp.y * CELL,
+        processing: false, processTicks: 0,
       });
       totalSpawned++;
       spawnQueue--;
@@ -446,9 +553,9 @@ function simTick() {
   }
 
   // Move products
-  const toRemove = [];
-  for (let i = 0; i < products.length; i++) {
-    const p = products[i];
+  var toRemove = [];
+  for (var i = 0; i < products.length; i++) {
+    var p = products[i];
     if (p.processing) {
       p.processTicks++;
       if (p.processTicks >= 3) {
@@ -459,10 +566,13 @@ function simTick() {
       continue;
     }
 
-    const gx = Math.round(p.x), gy = Math.round(p.y);
+    var gx = Math.round(p.x), gy = Math.round(p.y);
 
     // Check if at output
-    const output = lv.outputs.find(o => o.x === gx && o.y === gy);
+    var output = null;
+    for (var o = 0; o < lv.outputs.length; o++) {
+      if (lv.outputs[o].x === gx && lv.outputs[o].y === gy) { output = lv.outputs[o]; break; }
+    }
     if (output) {
       if (p.defective) {
         score -= 20;
@@ -482,32 +592,28 @@ function simTick() {
       continue;
     }
 
-    // Get cell content
-    const cell = inBounds(gx, gy) ? grid[gy][gx] : null;
+    var cell = inBounds(gx, gy) ? grid[gy][gx] : null;
 
-    // Check if on input cell — push right
-    const isInput = lv.inputs.some(inp => inp.x === gx && inp.y === gy);
+    var isInput = false;
+    for (var ii = 0; ii < lv.inputs.length; ii++) {
+      if (lv.inputs[ii].x === gx && lv.inputs[ii].y === gy) { isInput = true; break; }
+    }
 
-    let moveDir = null;
+    var moveDir = null;
     if (cell) {
       switch (cell.type) {
         case 'belt':
           moveDir = cell.dir;
           break;
-        case 'splitter': {
-          // Alternate direction: perpendicular to belt dir
-          const base = DIRS[cell.dir];
-          if (!cell._count) cell._count = 0;
+        case 'splitter':
+          var dirIdx = DIR_ORDER.indexOf(cell.dir);
           if (cell._count % 2 === 0) {
-            // Turn clockwise
-            moveDir = DIR_ORDER[(DIR_ORDER.indexOf(cell.dir) + 1) % 4];
+            moveDir = DIR_ORDER[(dirIdx + 1) % 4];
           } else {
-            // Turn counter-clockwise
-            moveDir = DIR_ORDER[(DIR_ORDER.indexOf(cell.dir) + 3) % 4];
+            moveDir = DIR_ORDER[(dirIdx + 3) % 4];
           }
           cell._count++;
           break;
-        }
         case 'processor':
           if (p.color === 'raw' && !p.processing) {
             p.processing = true;
@@ -516,11 +622,13 @@ function simTick() {
           }
           moveDir = cell.dir;
           break;
-        case 'sorter': {
-          // Find nearest matching output and route toward it
-          const target = lv.outputs.find(o => o.color === p.color);
+        case 'sorter':
+          var target = null;
+          for (var oi = 0; oi < lv.outputs.length; oi++) {
+            if (lv.outputs[oi].color === p.color) { target = lv.outputs[oi]; break; }
+          }
           if (target) {
-            const dx = target.x - gx, dy = target.y - gy;
+            var dx = target.x - gx, dy = target.y - gy;
             if (Math.abs(dx) >= Math.abs(dy)) {
               moveDir = dx > 0 ? 'right' : 'left';
             } else {
@@ -530,7 +638,6 @@ function simTick() {
             moveDir = cell.dir;
           }
           break;
-        }
         case 'filter':
           if (p.defective) {
             toRemove.push(i);
@@ -542,14 +649,10 @@ function simTick() {
           moveDir = cell.dir;
           break;
         case 'booster':
-          // Move 2 cells in direction
           moveDir = cell.dir;
-          const d1 = DIRS[moveDir];
-          const nx = gx + d1.x * 2, ny = gy + d1.y * 2;
-          if (inBounds(nx, ny)) {
-            p.x = nx; p.y = ny;
-            continue;
-          }
+          var bd = DIRS[moveDir];
+          var bx = gx + bd.x * 2, by = gy + bd.y * 2;
+          if (inBounds(bx, by)) { p.x = bx; p.y = by; continue; }
           break;
       }
     } else if (isInput) {
@@ -557,20 +660,17 @@ function simTick() {
     }
 
     if (moveDir) {
-      const d = DIRS[moveDir];
-      const nx = gx + d.x, ny = gy + d.y;
+      var d = DIRS[moveDir];
+      var nx = gx + d.x, ny = gy + d.y;
       if (inBounds(nx, ny)) {
-        p.x = nx;
-        p.y = ny;
+        p.x = nx; p.y = ny;
       } else {
-        // Fell off grid
         toRemove.push(i);
         lost++;
         score -= 5;
         sfxLost();
       }
     } else if (!isInput) {
-      // Stuck — no conveyor, falls off
       toRemove.push(i);
       lost++;
       score -= 5;
@@ -578,23 +678,23 @@ function simTick() {
     }
   }
 
-  // Remove delivered/lost products (reverse order)
-  toRemove.sort((a, b) => b - a).forEach(i => products.splice(i, 1));
+  toRemove.sort(function(a,b){return b-a});
+  for (var r = 0; r < toRemove.length; r++) products.splice(toRemove[r], 1);
 
   // Check level complete
   if (spawnQueue === 0 && products.length === 0 && totalSpawned > 0) {
     levelComplete = true;
     pauseSim();
-    const eff = totalSpawned > 0 ? Math.round((delivered / totalSpawned) * 100) : 0;
-    let stars = 0;
+    var eff = totalSpawned > 0 ? Math.round((delivered / totalSpawned) * 100) : 0;
+    var stars = 0;
     if (delivered > 0) stars = 1;
     if (eff >= 80) stars = 2;
     if (eff >= 95) stars = 3;
 
-    const prev = levelStars[currentLevel] || 0;
+    var prev = levelStars[currentLevel] || 0;
     if (stars > prev) {
       levelStars[currentLevel] = stars;
-      localStorage.setItem('ffStars', JSON.stringify(levelStars));
+      try { localStorage.setItem('ffStars', JSON.stringify(levelStars)); } catch(e) {}
     }
 
     sfxComplete();
@@ -604,292 +704,256 @@ function simTick() {
   updateHUD();
 }
 
-// ── Particles ──────────────────────────────────────────────
+// ── Particles ────────────────────────────────────────
 function burst(gx, gy, color) {
-  for (let i = 0; i < 8; i++) {
-    const angle = (Math.PI * 2 / 8) * i + Math.random() * 0.5;
+  for (var i = 0; i < 8; i++) {
+    var angle = (Math.PI * 2 / 8) * i + Math.random() * 0.5;
     particles.push({
       x: gx * CELL + CELL / 2, y: gy * CELL + CELL / 2,
       vx: Math.cos(angle) * (1.5 + Math.random() * 2),
       vy: Math.sin(angle) * (1.5 + Math.random() * 2),
-      life: 30, color, r: 2 + Math.random() * 2,
+      life: 30, color: color, r: 2 + Math.random() * 2,
     });
   }
 }
 
-// ── Rendering ──────────────────────────────────────────────
+// ── Rendering ────────────────────────────────────────
 function draw() {
   animFrame++;
   ctx.clearRect(0, 0, W, H);
 
-  // Background
   ctx.fillStyle = '#0a0a16';
   ctx.fillRect(0, 0, W, H);
 
   // Grid lines
   ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 1;
-  for (let x = 0; x <= COLS; x++) {
+  for (var x = 0; x <= COLS; x++) {
     ctx.beginPath(); ctx.moveTo(x * CELL, 0); ctx.lineTo(x * CELL, H); ctx.stroke();
   }
-  for (let y = 0; y <= ROWS; y++) {
+  for (var y = 0; y <= ROWS; y++) {
     ctx.beginPath(); ctx.moveTo(0, y * CELL); ctx.lineTo(W, y * CELL); ctx.stroke();
   }
 
-  const lv = LEVELS[currentLevel];
+  var lv = LEVELS[currentLevel];
 
-  // Draw inputs
-  lv.inputs.forEach(inp => {
-    ctx.fillStyle = 'rgba(46,204,113,0.08)';
+  // Draw inputs with labels
+  for (var i = 0; i < lv.inputs.length; i++) {
+    var inp = lv.inputs[i];
+    var ic = COLORS[inp.color] || COLORS.raw;
+    ctx.fillStyle = 'rgba(46,204,113,0.1)';
     ctx.fillRect(inp.x * CELL, inp.y * CELL, CELL, CELL);
-    ctx.strokeStyle = 'rgba(46,204,113,0.3)';
+    ctx.strokeStyle = 'rgba(46,204,113,0.4)';
     ctx.lineWidth = 2;
     ctx.strokeRect(inp.x * CELL + 1, inp.y * CELL + 1, CELL - 2, CELL - 2);
+    // Color dot
+    ctx.beginPath();
+    ctx.arc(inp.x * CELL + CELL * 0.35, inp.y * CELL + CELL / 2, CELL * 0.15, 0, Math.PI * 2);
+    ctx.fillStyle = ic.fill;
+    ctx.fill();
     // Arrow
-    ctx.fillStyle = 'rgba(46,204,113,0.6)';
-    ctx.font = `${CELL * 0.5}px Inter`;
+    ctx.fillStyle = 'rgba(46,204,113,0.7)';
+    ctx.font = 'bold ' + (CELL * 0.4) + 'px Inter';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('→', inp.x * CELL + CELL / 2, inp.y * CELL + CELL / 2);
-  });
+    ctx.fillText('\u2192', inp.x * CELL + CELL * 0.75, inp.y * CELL + CELL / 2);
+    // IN label
+    ctx.font = 'bold ' + (CELL * 0.18) + 'px Inter';
+    ctx.fillStyle = 'rgba(46,204,113,0.5)';
+    ctx.fillText('IN', inp.x * CELL + CELL / 2, inp.y * CELL + CELL * 0.15);
+  }
 
-  // Draw outputs
-  lv.outputs.forEach(out => {
-    const c = COLORS[out.color];
-    ctx.fillStyle = c.glow.replace('0.4', '0.08');
+  // Draw outputs with labels
+  for (var i = 0; i < lv.outputs.length; i++) {
+    var out = lv.outputs[i];
+    var c = COLORS[out.color];
+    ctx.fillStyle = c.glow.replace('0.4', '0.1');
     ctx.fillRect(out.x * CELL, out.y * CELL, CELL, CELL);
-    ctx.strokeStyle = c.glow.replace('0.4', '0.4');
+    ctx.strokeStyle = c.glow.replace('0.4', '0.5');
     ctx.lineWidth = 2;
     ctx.strokeRect(out.x * CELL + 1, out.y * CELL + 1, CELL - 2, CELL - 2);
-    // Color indicator
+    // Pulsing color dot
+    var pulse = 0.5 + Math.sin(animFrame * 0.05) * 0.3;
     ctx.beginPath();
     ctx.arc(out.x * CELL + CELL / 2, out.y * CELL + CELL / 2, CELL * 0.25, 0, Math.PI * 2);
     ctx.fillStyle = c.fill;
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = pulse;
     ctx.fill();
     ctx.globalAlpha = 1;
-  });
+    // OUT label
+    ctx.font = 'bold ' + (CELL * 0.18) + 'px Inter';
+    ctx.fillStyle = c.fill;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('OUT', out.x * CELL + CELL / 2, out.y * CELL + CELL * 0.15);
+  }
 
   // Draw grid pieces
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      const cell = grid[y][x];
+  for (var y = 0; y < ROWS; y++) {
+    for (var x = 0; x < COLS; x++) {
+      var cell = grid[y][x];
       if (!cell) continue;
-      const cx = x * CELL + CELL / 2, cy = y * CELL + CELL / 2;
-      const pad = 3;
-
-      switch (cell.type) {
-        case 'belt':
-          drawBelt(x, y, cell.dir);
-          break;
-        case 'splitter':
-          drawSplitter(x, y, cell.dir);
-          break;
-        case 'processor':
-          drawProcessor(x, y, cell.dir);
-          break;
-        case 'sorter':
-          drawSorter(x, y, cell.dir);
-          break;
-        case 'filter':
-          drawFilter(x, y, cell.dir);
-          break;
-        case 'booster':
-          drawBooster(x, y, cell.dir);
-          break;
-      }
+      drawPiece(x, y, cell);
     }
   }
 
   // Draw products
-  products.forEach(p => {
-    // Animate position
-    const tx = p.x * CELL + CELL / 2, ty = p.y * CELL + CELL / 2;
-    p.animX += (tx - p.animX) * 0.25;
-    p.animY += (ty - p.animY) * 0.25;
+  for (var i = 0; i < products.length; i++) {
+    var p = products[i];
+    var tx = p.x * CELL + CELL / 2, ty = p.y * CELL + CELL / 2;
+    p.animX += (tx - p.animX) * 0.3;
+    p.animY += (ty - p.animY) * 0.3;
 
-    const c = COLORS[p.color] || COLORS.raw;
-    const r = CELL * 0.22;
+    var pc = COLORS[p.color] || COLORS.raw;
+    var r = CELL * 0.22;
 
-    // Glow
-    ctx.shadowColor = c.glow;
-    ctx.shadowBlur = 10;
-
+    ctx.shadowColor = pc.glow;
+    ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.arc(p.animX, p.animY, r, 0, Math.PI * 2);
-    ctx.fillStyle = c.fill;
+    ctx.fillStyle = pc.fill;
     ctx.fill();
-
     ctx.shadowBlur = 0;
 
-    // Processing animation
     if (p.processing) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2;
-      const a = (animFrame * 0.15) % (Math.PI * 2);
+      var a = (animFrame * 0.15) % (Math.PI * 2);
       ctx.beginPath();
-      ctx.arc(p.animX, p.animY, r + 3, a, a + Math.PI * 1.2);
+      ctx.arc(p.animX, p.animY, r + 4, a, a + Math.PI * 1.2);
       ctx.stroke();
     }
 
-    // Defective marker
     if (p.defective) {
       ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
-      const s = r * 0.6;
+      ctx.lineWidth = 2.5;
+      var s = r * 0.55;
       ctx.beginPath();
       ctx.moveTo(p.animX - s, p.animY - s); ctx.lineTo(p.animX + s, p.animY + s);
       ctx.moveTo(p.animX + s, p.animY - s); ctx.lineTo(p.animX - s, p.animY + s);
       ctx.stroke();
     }
-  });
+  }
 
   // Draw particles
-  particles = particles.filter(p => p.life > 0);
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.vx *= 0.95; p.vy *= 0.95;
-    p.life--;
-    ctx.globalAlpha = p.life / 30;
+  var newParts = [];
+  for (var i = 0; i < particles.length; i++) {
+    var pt = particles[i];
+    pt.x += pt.vx; pt.y += pt.vy;
+    pt.vx *= 0.94; pt.vy *= 0.94;
+    pt.life--;
+    if (pt.life <= 0) continue;
+    ctx.globalAlpha = pt.life / 30;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
+    ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+    ctx.fillStyle = pt.color;
     ctx.fill();
-    ctx.globalAlpha = 1;
-  });
+    newParts.push(pt);
+  }
+  ctx.globalAlpha = 1;
+  particles = newParts;
 
   requestAnimationFrame(draw);
 }
 
-function drawBelt(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL;
-  const pad = 4;
-  ctx.fillStyle = 'rgba(99,102,241,0.12)';
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(99,102,241,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
+function drawPiece(x, y, cell) {
+  var cx = x * CELL, cy = y * CELL, mid = CELL / 2;
+  var pad = 3;
+  var d = DIRS[cell.dir];
 
-  // Animated dashes
-  const mid = CELL / 2;
-  const d = DIRS[dir];
-  ctx.strokeStyle = 'rgba(99,102,241,0.6)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([4, 4]);
-  ctx.lineDashOffset = -(animFrame * 0.8);
-  ctx.beginPath();
-  if (d.x !== 0) {
-    ctx.moveTo(cx + pad + 2, cy + mid);
-    ctx.lineTo(cx + CELL - pad - 2, cy + mid);
-  } else {
-    ctx.moveTo(cx + mid, cy + pad + 2);
-    ctx.lineTo(cx + mid, cy + CELL - pad - 2);
+  switch (cell.type) {
+    case 'belt':
+      ctx.fillStyle = 'rgba(99,102,241,0.15)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(99,102,241,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      // Animated dashes
+      ctx.strokeStyle = 'rgba(99,102,241,0.7)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.lineDashOffset = -(animFrame * 0.8);
+      ctx.beginPath();
+      if (d.x !== 0) {
+        ctx.moveTo(cx + pad + 3, cy + mid); ctx.lineTo(cx + CELL - pad - 3, cy + mid);
+      } else {
+        ctx.moveTo(cx + mid, cy + pad + 3); ctx.lineTo(cx + mid, cy + CELL - pad - 3);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      drawArrowHead(cx + mid, cy + mid, cell.dir, 'rgba(99,102,241,0.8)', 7);
+      break;
+
+    case 'splitter':
+      ctx.fillStyle = 'rgba(168,85,247,0.15)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(168,85,247,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.font = 'bold ' + (CELL * 0.4) + 'px Inter';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(168,85,247,0.8)';
+      ctx.fillText('Y', cx + mid, cy + mid);
+      break;
+
+    case 'processor':
+      ctx.fillStyle = 'rgba(46,204,113,0.12)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(46,204,113,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.save();
+      ctx.translate(cx + mid, cy + mid);
+      ctx.rotate(animFrame * 0.03);
+      ctx.font = (CELL * 0.45) + 'px Inter';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(46,204,113,0.8)';
+      ctx.fillText('\u2699', 0, 0);
+      ctx.restore();
+      drawArrowHead(cx + mid, cy + mid + CELL * 0.3, cell.dir, 'rgba(46,204,113,0.6)', 5);
+      break;
+
+    case 'sorter':
+      ctx.fillStyle = 'rgba(251,191,36,0.12)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(251,191,36,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.font = 'bold ' + (CELL * 0.35) + 'px Inter';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(251,191,36,0.85)';
+      ctx.fillText('\u2295', cx + mid, cy + mid);
+      break;
+
+    case 'filter':
+      ctx.fillStyle = 'rgba(239,68,68,0.1)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(239,68,68,0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.font = 'bold ' + (CELL * 0.4) + 'px Inter';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(239,68,68,0.8)';
+      ctx.fillText('\u2717', cx + mid, cy + mid);
+      drawArrowHead(cx + mid, cy + mid + CELL * 0.3, cell.dir, 'rgba(239,68,68,0.5)', 5);
+      break;
+
+    case 'booster':
+      ctx.fillStyle = 'rgba(59,130,246,0.12)';
+      ctx.fillRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      ctx.strokeStyle = 'rgba(59,130,246,0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx + pad, cy + pad, CELL - pad*2, CELL - pad*2);
+      var bpulse = 0.6 + Math.sin(animFrame * 0.1) * 0.3;
+      ctx.font = (CELL * 0.45) + 'px Inter';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(59,130,246,' + bpulse + ')';
+      ctx.fillText('\u26A1', cx + mid, cy + mid);
+      drawArrowHead(cx + mid, cy + mid + CELL * 0.3, cell.dir, 'rgba(59,130,246,0.5)', 5);
+      break;
   }
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Direction arrow
-  drawArrow(cx + mid, cy + mid, dir, 'rgba(99,102,241,0.7)');
 }
 
-function drawSplitter(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL, mid = CELL / 2;
-  ctx.fillStyle = 'rgba(168,85,247,0.12)';
-  const pad = 4;
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(168,85,247,0.35)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-
-  // Y shape
-  ctx.strokeStyle = 'rgba(168,85,247,0.7)';
-  ctx.lineWidth = 2;
-  const dirIdx = DIR_ORDER.indexOf(dir);
-  const cw = DIR_ORDER[(dirIdx + 1) % 4];
-  const ccw = DIR_ORDER[(dirIdx + 3) % 4];
-  drawArrow(cx + mid - 4, cy + mid - 4, cw, 'rgba(168,85,247,0.6)', 6);
-  drawArrow(cx + mid + 4, cy + mid + 4, ccw, 'rgba(168,85,247,0.6)', 6);
-
-  ctx.font = `bold ${CELL * 0.3}px Inter`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(168,85,247,0.7)';
-  ctx.fillText('⟐', cx + mid, cy + mid);
-}
-
-function drawProcessor(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL, mid = CELL / 2;
-  ctx.fillStyle = 'rgba(46,204,113,0.1)';
-  const pad = 4;
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(46,204,113,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-
-  // Gear icon (rotating)
-  ctx.save();
-  ctx.translate(cx + mid, cy + mid);
-  ctx.rotate(animFrame * 0.03);
-  ctx.font = `${CELL * 0.45}px Inter`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(46,204,113,0.7)';
-  ctx.fillText('⚙', 0, 0);
-  ctx.restore();
-
-  drawArrow(cx + mid, cy + mid + CELL * 0.3, dir, 'rgba(46,204,113,0.5)', 5);
-}
-
-function drawSorter(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL, mid = CELL / 2;
-  ctx.fillStyle = 'rgba(251,191,36,0.1)';
-  const pad = 4;
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(251,191,36,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-
-  ctx.font = `${CELL * 0.4}px Inter`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(251,191,36,0.8)';
-  ctx.fillText('⊕', cx + mid, cy + mid);
-}
-
-function drawFilter(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL, mid = CELL / 2;
-  ctx.fillStyle = 'rgba(239,68,68,0.08)';
-  const pad = 4;
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(239,68,68,0.3)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-
-  ctx.font = `${CELL * 0.4}px Inter`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(239,68,68,0.7)';
-  ctx.fillText('✕', cx + mid, cy + mid);
-
-  drawArrow(cx + mid, cy + mid + CELL * 0.3, dir, 'rgba(239,68,68,0.5)', 5);
-}
-
-function drawBooster(x, y, dir) {
-  const cx = x * CELL, cy = y * CELL, mid = CELL / 2;
-  ctx.fillStyle = 'rgba(59,130,246,0.1)';
-  const pad = 4;
-  ctx.fillRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-  ctx.strokeStyle = 'rgba(59,130,246,0.35)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(cx + pad, cy + pad, CELL - pad * 2, CELL - pad * 2);
-
-  // Lightning bolt
-  const pulse = 0.6 + Math.sin(animFrame * 0.1) * 0.3;
-  ctx.font = `${CELL * 0.45}px Inter`;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillStyle = `rgba(59,130,246,${pulse})`;
-  ctx.fillText('⚡', cx + mid, cy + mid);
-
-  drawArrow(cx + mid, cy + mid + CELL * 0.3, dir, 'rgba(59,130,246,0.5)', 5);
-}
-
-function drawArrow(x, y, dir, color, size = 8) {
-  const d = DIRS[dir];
+function drawArrowHead(x, y, dir, color, size) {
+  var d = DIRS[dir];
   ctx.fillStyle = color;
   ctx.beginPath();
   ctx.moveTo(x + d.x * size, y + d.y * size);
@@ -898,51 +962,72 @@ function drawArrow(x, y, dir, color, size = 8) {
   ctx.fill();
 }
 
-// ── HUD ────────────────────────────────────────────────────
+// ── HUD ──────────────────────────────────────────────
 function updateHUD() {
-  const lv = LEVELS[currentLevel];
+  var lv = LEVELS[currentLevel];
   document.getElementById('hud-level').textContent = currentLevel + 1;
   document.getElementById('hud-score').textContent = score;
-  const total = delivered + lost;
-  const eff = total > 0 ? Math.round((delivered / Math.max(totalSpawned, 1)) * 100) : 0;
-  const effEl = document.getElementById('hud-eff');
-  effEl.textContent = total > 0 ? eff + '%' : '—';
+  var total = delivered + lost;
+  var eff = total > 0 ? Math.round((delivered / Math.max(totalSpawned, 1)) * 100) : 0;
+  var effEl = document.getElementById('hud-eff');
+  effEl.textContent = total > 0 ? eff + '%' : '\u2014';
   effEl.className = 'value ' + (eff >= 80 ? 'green' : eff >= 50 ? 'amber' : total > 0 ? 'red' : 'green');
-  document.getElementById('hud-del').textContent = delivered + '/' + (lv.products);
-  const stars = eff >= 95 ? '★★★' : eff >= 80 ? '★★☆' : delivered > 0 ? '★☆☆' : '☆☆☆';
+  document.getElementById('hud-del').textContent = delivered + '/' + lv.products;
+  var stars = eff >= 95 ? '\u2605\u2605\u2605' : eff >= 80 ? '\u2605\u2605\u2606' : delivered > 0 ? '\u2605\u2606\u2606' : '\u2606\u2606\u2606';
   document.getElementById('hud-stars').textContent = stars;
 
+  // Update hint
+  if (lv.hint && !running && totalSpawned === 0) {
+    document.getElementById('hint-bar').innerHTML = lv.hint;
+  } else if (running) {
+    document.getElementById('hint-bar').innerHTML = 'Products flowing... <strong>Pause</strong> to adjust layout.';
+  } else if (totalSpawned > 0 && !levelComplete) {
+    document.getElementById('hint-bar').innerHTML = 'Hit <strong>Run</strong> to continue or <strong>Reset</strong> to restart.';
+  }
+
   // Update toolbar locked state
-  document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
-    const tool = btn.dataset.tool;
-    if (tool === 'erase') return;
-    if (lv.pieces.includes(tool)) {
-      btn.classList.remove('locked');
+  var btns = document.querySelectorAll('.tool-btn[data-tool]');
+  for (var b = 0; b < btns.length; b++) {
+    var tool = btns[b].getAttribute('data-tool');
+    if (tool === 'erase') continue;
+    if (lv.pieces.indexOf(tool) >= 0) {
+      btns[b].classList.remove('locked');
     } else {
-      btn.classList.add('locked');
+      btns[b].classList.add('locked');
     }
-  });
+  }
 }
 
-// ── Level Select ───────────────────────────────────────────
+// ── Level Select ─────────────────────────────────────
 function buildLevelSelect() {
-  const grid = document.getElementById('level-grid');
-  grid.innerHTML = '';
-  LEVELS.forEach((lv, i) => {
-    const unlocked = i === 0 || levelStars[i - 1] >= 1;
-    const btn = document.createElement('button');
-    btn.className = 'level-btn' + (unlocked ? '' : ' locked');
-    const s = levelStars[i] || 0;
-    btn.innerHTML = `
-      <div class="num">${i + 1}</div>
-      <div class="stars">${'★'.repeat(s)}${'☆'.repeat(3 - s)}</div>
-      <div class="name">${lv.name}</div>
-    `;
-    if (unlocked) {
-      btn.onclick = () => loadLevel(i);
-    }
-    grid.appendChild(btn);
-  });
+  var container = document.getElementById('level-grid');
+  container.innerHTML = '';
+  for (var i = 0; i < LEVELS.length; i++) {
+    (function(idx) {
+      var lv = LEVELS[idx];
+      var unlocked = idx === 0 || (levelStars[idx - 1] && levelStars[idx - 1] >= 1);
+      var btn = document.createElement('button');
+      btn.className = 'level-btn' + (unlocked ? '' : ' locked');
+      var s = levelStars[idx] || 0;
+      btn.innerHTML =
+        '<div class="num">' + (idx + 1) + '</div>' +
+        '<div class="stars">' + '\u2605'.repeat(s) + '\u2606'.repeat(3 - s) + '</div>' +
+        '<div class="name">' + lv.name + '</div>';
+      if (unlocked) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          loadLevel(idx);
+        });
+        btn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          loadLevel(idx);
+        });
+      }
+      container.appendChild(btn);
+    })(i);
+  }
 }
 
 function showLevelSelect() {
@@ -951,8 +1036,8 @@ function showLevelSelect() {
   document.getElementById('complete-overlay').classList.add('hidden');
 }
 
-function loadLevel(i) {
-  currentLevel = i;
+function loadLevel(idx) {
+  currentLevel = idx;
   initGrid();
   document.getElementById('level-overlay').classList.add('hidden');
   document.getElementById('complete-overlay').classList.add('hidden');
@@ -962,80 +1047,85 @@ function loadLevel(i) {
 function showComplete(stars, eff) {
   document.getElementById('complete-title').textContent =
     stars >= 3 ? 'Perfect Run!' : stars >= 2 ? 'Level Complete!' : 'Level Cleared';
-  document.getElementById('complete-stars').textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+  document.getElementById('complete-stars').textContent = '\u2605'.repeat(stars) + '\u2606'.repeat(3 - stars);
   document.getElementById('complete-score').textContent = score;
   document.getElementById('complete-eff').textContent = eff + '%';
   document.getElementById('complete-del').textContent = delivered + '/' + LEVELS[currentLevel].products;
   document.getElementById('complete-overlay').classList.remove('hidden');
 
-  const hasNext = currentLevel < LEVELS.length - 1;
+  var hasNext = currentLevel < LEVELS.length - 1;
   document.getElementById('btn-next').style.display = hasNext ? '' : 'none';
 }
 
-// ── Input Handling ─────────────────────────────────────────
-canvas.addEventListener('click', (e) => {
-  if (AC.state === 'suspended') AC.resume();
-  const rect = canvas.getBoundingClientRect();
-  const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
-  const gx = Math.floor((e.clientX - rect.left) * sx / CELL);
-  const gy = Math.floor((e.clientY - rect.top) * sy / CELL);
-  if (inBounds(gx, gy)) placePiece(gx, gy);
-});
+// ── Toolbar Events ───────────────────────────────────
+var toolBtns = document.querySelectorAll('.tool-btn[data-tool]');
+for (var b = 0; b < toolBtns.length; b++) {
+  (function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (btn.classList.contains('locked')) return;
+      var all = document.querySelectorAll('.tool-btn[data-tool]');
+      for (var j = 0; j < all.length; j++) all[j].classList.remove('active');
+      btn.classList.add('active');
+      selectedTool = btn.getAttribute('data-tool');
+    });
+  })(toolBtns[b]);
+}
 
-// Toolbar
-document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (btn.classList.contains('locked')) return;
-    document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedTool = btn.dataset.tool;
-  });
-});
-
-document.getElementById('run-btn').addEventListener('click', () => {
+document.getElementById('run-btn').addEventListener('click', function(e) {
+  e.preventDefault();
   if (levelComplete) return;
   if (running) pauseSim(); else startSim();
 });
 
-document.getElementById('reset-btn').addEventListener('click', resetLevel);
+document.getElementById('reset-btn').addEventListener('click', function(e) {
+  e.preventDefault();
+  resetLevel();
+});
 
-document.getElementById('btn-retry').addEventListener('click', () => {
+document.getElementById('btn-retry').addEventListener('click', function(e) {
+  e.preventDefault();
   document.getElementById('complete-overlay').classList.add('hidden');
   resetLevel();
 });
-document.getElementById('btn-levels').addEventListener('click', showLevelSelect);
-document.getElementById('btn-next').addEventListener('click', () => {
+document.getElementById('btn-levels').addEventListener('click', function(e) {
+  e.preventDefault();
+  showLevelSelect();
+});
+document.getElementById('btn-next').addEventListener('click', function(e) {
+  e.preventDefault();
   if (currentLevel < LEVELS.length - 1) loadLevel(currentLevel + 1);
 });
 
 // Keyboard
-document.addEventListener('keydown', (e) => {
-  const key = e.key.toLowerCase();
+document.addEventListener('keydown', function(e) {
+  var key = e.key.toLowerCase();
   if (key === ' ' || key === 'spacebar') {
     e.preventDefault();
     if (levelComplete) return;
     if (running) pauseSim(); else startSim();
   }
   if (key === 'r') resetLevel();
-  if (key === '1') selectTool('belt');
-  if (key === '2') selectTool('splitter');
-  if (key === '3') selectTool('processor');
-  if (key === '4') selectTool('sorter');
-  if (key === '5') selectTool('filter');
-  if (key === '6') selectTool('booster');
-  if (key === 'e') selectTool('erase');
+  if (key === '1') selectToolByName('belt');
+  if (key === '2') selectToolByName('splitter');
+  if (key === '3') selectToolByName('processor');
+  if (key === '4') selectToolByName('sorter');
+  if (key === '5') selectToolByName('filter');
+  if (key === '6') selectToolByName('booster');
+  if (key === 'e') selectToolByName('erase');
 });
 
-function selectTool(tool) {
-  const btn = document.querySelector(`.tool-btn[data-tool="${tool}"]`);
+function selectToolByName(tool) {
+  var btn = document.querySelector('.tool-btn[data-tool="' + tool + '"]');
   if (btn && !btn.classList.contains('locked')) {
-    document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+    var all = document.querySelectorAll('.tool-btn[data-tool]');
+    for (var j = 0; j < all.length; j++) all[j].classList.remove('active');
     btn.classList.add('active');
     selectedTool = tool;
   }
 }
 
-// ── Init ───────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────
 showLevelSelect();
 draw();
 </script>

@@ -102,7 +102,7 @@
     /* ── Home ──────────────────────────────────────────────── */
     .hero {
       background: linear-gradient(135deg, #080810 0%, #0f0f1a 40%, #1a1a2e 70%, #312e81 100%);
-      padding: 3.5rem 1.5rem 2.5rem;
+      padding: 3rem 1.5rem 2.2rem;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -153,15 +153,44 @@
 
     .hero h1 span { color: #6366f1; }
 
+    .hero-avatar-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-avatar-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, #6366f1, #818cf8, #a78bfa, #6366f1);
+      opacity: 0.6;
+      animation: avatar-spin 8s linear infinite;
+    }
+
+    .hero-avatar-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    @keyframes avatar-spin {
+      to { transform: rotate(360deg); }
+    }
+
     .hero-avatar {
-      width: 96px;
-      height: 96px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid rgba(99,102,241,0.4);
-      margin-bottom: 1rem;
+      border: 3px solid #080810;
       position: relative;
-      box-shadow: 0 0 24px rgba(99,102,241,0.2);
+      display: block;
+      z-index: 1;
     }
 
     .hero p {
@@ -374,8 +403,9 @@
   <!-- Home -->
   <div id="panel-home" class="tab-panel active">
     <div class="hero">
-      <img src="roman-martins.jpg" alt="Roman Martins" class="hero-avatar">
-      <span class="badge">⚗️ Roman's Lab</span>
+      <div class="hero-avatar-wrap">
+        <img src="roman-martins.jpg" alt="Roman Martins" class="hero-avatar">
+      </div>
       <h1>Roman's <span>Lab</span></h1>
       <p>AI tools, experiments & builds — by Roman Martins.</p>
     </div>

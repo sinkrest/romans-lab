@@ -334,6 +334,16 @@
       border-color: rgba(48,207,67,0.25);
     }
 
+    /* Manufacturing card variant — warm orange accent */
+    .card.mfg-card::before {
+      background: linear-gradient(90deg, #c65d21, #a04a18);
+    }
+
+    .card.mfg-card:hover {
+      border-color: rgba(198,93,33,0.35);
+      box-shadow: 0 8px 28px rgba(198,93,33,0.08);
+    }
+
     .footer {
       text-align: center;
       padding: 2rem 1rem;
@@ -462,6 +472,19 @@
         <h2>Ghost Creator Advisor</h2>
         <p>Enter your Ghost publication metrics. Get a clear diagnosis of your media business — creator stage, biggest lever, and your top 3 recommendations.</p>
         <span class="tag">✦ Live AI Tool</span>
+      </div>
+
+      <!-- Manufacturing AI -->
+      <div class="suite-header" style="--suite-color: #c65d21;">
+        <span class="suite-header-label" style="color: #c65d21;">Manufacturing AI</span>
+        <span class="suite-header-count" style="color: rgba(198,93,33,0.7); background: rgba(198,93,33,0.08); border-color: rgba(198,93,33,0.2);">1 tool</span>
+      </div>
+
+      <div class="card mfg-card" onclick="openApp('https://jiga-rfq-readiness.vercel.app', 'Should-Cost Estimator')">
+        <div class="icon">$</div>
+        <h2>Should-Cost Estimator</h2>
+        <p>Enter part specs — material, method, tolerances, quantity. Get an AI-powered should-cost estimate, DFM risk analysis, cost drivers with savings potential, and spec readiness score.</p>
+        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ New · Live AI Tool</span>
       </div>
 
       <!-- AI PM Toolkit -->

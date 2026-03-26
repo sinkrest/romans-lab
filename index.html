@@ -477,14 +477,21 @@
       <!-- Manufacturing Toolkit -->
       <div class="suite-header" style="--suite-color: #c65d21;">
         <span class="suite-header-label" style="color: #c65d21;">Manufacturing Toolkit</span>
-        <span class="suite-header-count" style="color: rgba(198,93,33,0.7); background: rgba(198,93,33,0.08); border-color: rgba(198,93,33,0.2);">1 tool</span>
+        <span class="suite-header-count" style="color: rgba(198,93,33,0.7); background: rgba(198,93,33,0.08); border-color: rgba(198,93,33,0.2);">2 tools</span>
       </div>
 
-      <div class="card mfg-card" onclick="openApp('https://jiga-rfq-readiness.vercel.app', 'Should-Cost Estimator')">
+      <div class="card mfg-card" onclick="openApp('https://jiga-rfq-readiness.vercel.app', 'RFQ Readiness Check')">
+        <div class="icon">✓</div>
+        <h2>RFQ Readiness Check</h2>
+        <p>Enter part specs — material, method, tolerances, quantity. Get a spec readiness score, DFM risk analysis, and actionable recommendations before you send the RFQ.</p>
+        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ Live AI Tool</span>
+      </div>
+
+      <div class="card mfg-card" onclick="openApp('https://partcost.vercel.app', 'Should-Cost Estimator')">
         <div class="icon">$</div>
         <h2>Should-Cost Estimator</h2>
-        <p>Enter part specs — material, method, tolerances, quantity. Get an AI-powered should-cost estimate, DFM risk analysis, cost drivers with savings potential, and spec readiness score.</p>
-        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ New · Live AI Tool</span>
+        <p>Upload a 2D drawing or enter specs. Get a detailed should-cost model with cost breakdown, quantity curves, DFM cost drivers, and quote red flags — powered by Claude vision.</p>
+        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ New · Drawing Upload</span>
       </div>
 
       <!-- AI PM Toolkit -->

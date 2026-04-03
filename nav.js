@@ -2,6 +2,7 @@
   const APPS = [
     { label: '⚡ AI OS', href: 'index.html', match: ['', 'index.html'] },
     { label: '🐍 Snake', href: 'snake.html', match: ['snake.html'] },
+    { label: '🧱 Tetris', href: 'tetris.html', match: ['tetris.html'] },
     { label: '🧪 Lab', href: 'https://sinkrest.github.io/lab/', match: [], external: true },
   ];
 

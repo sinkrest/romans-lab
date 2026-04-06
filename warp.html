@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Warp Core — Roman's Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: #020208;
+      color: #e4eaf4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .game-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 2px rgba(99,102,241,0.3),
+        0 0 0 4px rgba(2,2,8,0.8),
+        0 8px 40px rgba(0,0,0,0.6),
+        0 0 80px rgba(99,102,241,0.05);
+    }
+    canvas { display: block; }
+    .hint {
+      position: absolute;
+      bottom: 10px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 7px;
+      color: rgba(99,102,241,0.45);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<div class="game-wrap">
+  <canvas id="c" width="400" height="500"></canvas>
+  <div class="hint">A / D  or  ARROWS  or  TOUCH TO STEER</div>
+</div>
+<script>
+// ============================================
+// WARP CORE — Fly through a 3D tunnel, dodge walls, survive
+// ============================================
+const C = document.getElementById('c');
+const X = C.getContext('2d');
+const W = 400, H = 500;
+
+// --- State ---
+let state = 'title'; // title | play | dead
+let frame = 0;
+let score = 0;
+let best = +(localStorage.getItem('warp-best') || 0);
+let speed = 0;
+let distance = 0;
+let deadTimer = 0;
+let flash = 0;
+let shakeX = 0, shakeY = 0;
+let warping = false;
+let warpTimer = 0;
+
+// Player
+let px = 0;      // -1 to 1 horizontal
+let targetPx = 0;
+let tilt = 0;
+
+// Tunnel segments
+const SEGS = [];
+const SEG_DEPTH = 18;
+const VISIBLE = 40;
+const TUNNEL_R = 1.0;
+
+// Obstacles
+const OBS = [];
+
+// Particles
+const PARTS = [];
+
+// Stars
+const STARS = [];
+for (let i = 0; i < 80; i++) {
+  STARS.push({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    z: Math.random() * 2 + 0.5,
+    a: Math.random() * 0.6 + 0.2,
+  });
+}
+
+// Colors
+const palette = [
+  [99,102,241],   // indigo
+  [139,92,246],   // purple
+  [236,72,153],   // pink
+  [34,211,238],   // cyan
+  [16,185,129],   // green
+  [250,204,21],   // gold
+];
+
+function rgb(c, a) { return `rgba(${c[0]},${c[1]},${c[2]},${a})`; }
+
+function randColor() { return palette[Math.floor(Math.random() * palette.length)]; }
+
+// --- 3D Projection ---
+const FOV = 260;
+const CAM_Y = -0.15;
+const CAM_Z_OFF = 3;
+
+function project(x3, y3, z3) {
+  const z = z3 + 0.001;
+  return {
+    x: W/2 + (x3 * FOV) / z,
+    y: H/2 + ((y3 + CAM_Y) * FOV) / z,
+    s: FOV / z, // scale
+  };
+}
+
+// --- Tunnel Generation ---
+function genSegments() {
+  SEGS.length = 0;
+  for (let i = 0; i < VISIBLE + 20; i++) {
+    SEGS.push({
+      curve: 0,
+      color: palette[0],
+    });
+  }
+}
+
+function advanceTunnel() {
+  SEGS.shift();
+  const i = SEGS.length;
+  // Gentle curves
+  const curveFreq = 0.02 + Math.min(distance * 0.00001, 0.03);
+  const curveAmp = 0.3 + Math.min(distance * 0.0003, 0.8);
+  const curve = Math.sin((distance + i) * curveFreq) * curveAmp
+              + Math.sin((distance + i) * curveFreq * 2.3) * curveAmp * 0.4;
+
+  // Color cycling
+  const ci = Math.floor((distance + i) / 30) % palette.length;
+  SEGS.push({ curve, color: palette[ci] });
+}
+
+// --- Obstacle Generation ---
+function maybeSpawnObs() {
+  const interval = Math.max(12, 30 - Math.floor(distance / 200));
+  if (frame % interval !== 0 || distance < 40) return;
+
+  const types = ['wall-left', 'wall-right', 'wall-center', 'gate'];
+  // Weighted: gates more common early, walls increase
+  let type;
+  const r = Math.random();
+  if (distance < 150) {
+    type = r < 0.6 ? 'gate' : types[Math.floor(r * 3)];
+  } else {
+    type = types[Math.floor(r * types.length)];
+  }
+
+  OBS.push({
+    z: VISIBLE * SEG_DEPTH,
+    type,
+    color: randColor(),
+    scored: false,
+    hit: false,
+  });
+}
+
+// --- Input ---
+const keys = {};
+let touchX = null;
+
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if ((e.code === 'Space' || e.code === 'Enter') && state !== 'play') {
+    e.preventDefault();
+    startGame();
+  }
+});
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+C.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (state !== 'play') { startGame(); return; }
+  touchX = e.touches[0].clientX;
+}, { passive: false });
+C.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!touchX) return;
+  const rect = C.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  targetPx = (e.touches[0].clientX - cx) / (rect.width / 2);
+  targetPx = Math.max(-1, Math.min(1, targetPx));
+}, { passive: false });
+C.addEventListener('touchend', () => { touchX = null; });
+
+C.addEventListener('click', () => {
+  if (state !== 'play') startGame();
+});
+
+// --- Game Flow ---
+function startGame() {
+  if (state === 'dead' && deadTimer < 30) return;
+  state = 'play';
+  frame = 0;
+  score = 0;
+  speed = 0;
+  distance = 0;
+  deadTimer = 0;
+  flash = 0;
+  px = 0;
+  targetPx = 0;
+  tilt = 0;
+  warping = false;
+  warpTimer = 0;
+  OBS.length = 0;
+  PARTS.length = 0;
+  genSegments();
+}
+
+function die() {
+  state = 'dead';
+  deadTimer = 0;
+  flash = 10;
+  shakeX = 0; shakeY = 0;
+  if (score > best) {
+    best = score;
+    localStorage.setItem('warp-best', best);
+  }
+  // Explosion
+  for (let i = 0; i < 30; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const spd = 1 + Math.random() * 4;
+    PARTS.push({
+      x: W/2 + px * 80,
+      y: H * 0.65,
+      vx: Math.cos(a) * spd,
+      vy: Math.sin(a) * spd - 2,
+      life: 30 + Math.random() * 30,
+      max: 60,
+      color: randColor(),
+      size: 2 + Math.random() * 4,
+    });
+  }
+}
+
+// --- Update ---
+function update() {
+  frame++;
+
+  if (state === 'dead') {
+    deadTimer++;
+    updateParts();
+    return;
+  }
+  if (state !== 'play') return;
+
+  // Speed ramp
+  speed = Math.min(1.5, 0.4 + distance * 0.001);
+
+  // Warp boost every 50 points
+  if (score > 0 && score % 50 === 0 && !warping) {
+    warping = true;
+    warpTimer = 60;
+  }
+  if (warping) {
+    warpTimer--;
+    speed *= 2.2;
+    if (warpTimer <= 0) warping = false;
+  }
+
+  distance += speed;
+
+  // Input
+  if (keys['ArrowLeft'] || keys['KeyA']) targetPx -= 0.06;
+  if (keys['ArrowRight'] || keys['KeyD']) targetPx += 0.06;
+  targetPx = Math.max(-0.92, Math.min(0.92, targetPx));
+
+  // Smooth player movement
+  px += (targetPx - px) * 0.12;
+  tilt += ((targetPx - px) * 8 - tilt) * 0.1;
+
+  // Advance tunnel
+  if (Math.floor(distance) % SEG_DEPTH === 0 && distance > SEG_DEPTH) {
+    advanceTunnel();
+  }
+
+  // Obstacles
+  maybeSpawnObs();
+
+  for (let i = OBS.length - 1; i >= 0; i--) {
+    const o = OBS[i];
+    o.z -= speed * SEG_DEPTH * 0.18;
+
+    if (o.z < -SEG_DEPTH * 2) {
+      OBS.splice(i, 1);
+      continue;
+    }
+
+    // Check collision at player z (around z=CAM_Z_OFF)
+    if (o.z < CAM_Z_OFF + 1.5 && o.z > CAM_Z_OFF - 1 && !o.hit && !o.scored) {
+      const hitLeft = o.type === 'wall-left' && px < 0.15;
+      const hitRight = o.type === 'wall-right' && px > -0.15;
+      const hitCenter = o.type === 'wall-center' && px > -0.45 && px < 0.45;
+
+      if (hitLeft || hitRight || hitCenter) {
+        o.hit = true;
+        die();
+        return;
+      }
+
+      if (o.type === 'gate' || !hitLeft && !hitRight && !hitCenter) {
+        o.scored = true;
+        score++;
+        // Score particles
+        for (let j = 0; j < 8; j++) {
+          PARTS.push({
+            x: W/2 + px * 80 + (Math.random() - 0.5) * 40,
+            y: H * 0.55 + (Math.random() - 0.5) * 30,
+            vx: (Math.random() - 0.5) * 3,
+            vy: -Math.random() * 3 - 1,
+            life: 20 + Math.random() * 15,
+            max: 35,
+            color: o.color,
+            size: 2 + Math.random() * 3,
+          });
+        }
+      }
+    }
+  }
+
+  // Engine trail particles
+  if (frame % 2 === 0) {
+    PARTS.push({
+      x: W/2 + px * 80 + (Math.random() - 0.5) * 6,
+      y: H * 0.68 + Math.random() * 4,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: 1 + Math.random() * 2,
+      life: 10 + Math.random() * 8,
+      max: 18,
+      color: warping ? [250,204,21] : [99,102,241],
+      size: warping ? 3 : 2,
+    });
+  }
+
+  // Shake
+  if (warping) {
+    shakeX = (Math.random() - 0.5) * 3;
+    shakeY = (Math.random() - 0.5) * 2;
+  } else {
+    shakeX *= 0.9;
+    shakeY *= 0.9;
+  }
+
+  updateParts();
+}
+
+function updateParts() {
+  for (let i = PARTS.length - 1; i >= 0; i--) {
+    const p = PARTS[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    if (p.life <= 0) PARTS.splice(i, 1);
+  }
+}
+
+// --- Draw ---
+function draw() {
+  X.save();
+  X.translate(shakeX, shakeY);
+
+  // BG
+  X.fillStyle = '#020208';
+  X.fillRect(-5, -5, W+10, H+10);
+
+  // Stars — parallax
+  STARS.forEach(s => {
+    const sx = (s.x - speed * s.z * 2 * frame * 0.05) % W;
+    const sy = (s.y + speed * s.z * frame * 0.02) % H;
+    X.globalAlpha = s.a + Math.sin(frame * 0.05 + s.x) * 0.15;
+    X.fillStyle = '#6366f1';
+    X.fillRect((sx + W) % W, (sy + H) % H, s.z, s.z);
+  });
+  X.globalAlpha = 1;
+
+  // Tunnel
+  drawTunnel();
+
+  // Obstacles
+  OBS.forEach(o => drawObs(o));
+
+  // Particles
+  PARTS.forEach(p => {
+    const a = p.life / p.max;
+    X.globalAlpha = a;
+    X.fillStyle = rgb(p.color, 1);
+    const s = p.size * a;
+    X.fillRect(p.x - s/2, p.y - s/2, s, s);
+  });
+  X.globalAlpha = 1;
+
+  // Player ship
+  drawShip();
+
+  // Warp overlay
+  if (warping) {
+    X.globalAlpha = 0.06 + Math.sin(frame * 0.3) * 0.03;
+    X.fillStyle = '#facc15';
+    X.fillRect(0, 0, W, H);
+    X.globalAlpha = 1;
+  }
+
+  // Flash
+  if (flash > 0) {
+    X.globalAlpha = flash / 10 * 0.5;
+    X.fillStyle = '#ff3333';
+    X.fillRect(0, 0, W, H);
+    X.globalAlpha = 1;
+    flash--;
+  }
+
+  // HUD
+  drawHUD();
+
+  // Title
+  if (state === 'title') drawTitle();
+
+  // Death
+  if (state === 'dead' && deadTimer > 25) drawDeath();
+
+  X.restore();
+}
+
+function drawTunnel() {
+  let cx = 0, cy = 0;
+  const points = [];
+
+  for (let i = 0; i < VISIBLE; i++) {
+    const seg = SEGS[i];
+    if (!seg) continue;
+
+    const z = (i * SEG_DEPTH) * 0.12 + CAM_Z_OFF;
+    cx += (seg.curve || 0) * 0.06;
+
+    const p = project(cx, cy, z);
+    const r = p.s * TUNNEL_R;
+    points.push({ p, r, seg, i });
+  }
+
+  // Draw from far to near
+  for (let i = points.length - 1; i >= 1; i--) {
+    const far = points[i];
+    const near = points[i - 1];
+    const a = Math.max(0.02, 0.5 - i / VISIBLE * 0.6);
+    const col = far.seg.color;
+
+    // Filled quad (tunnel walls)
+    X.globalAlpha = a * 0.08;
+    X.fillStyle = rgb(col, 1);
+    // Left wall
+    X.beginPath();
+    X.moveTo(far.p.x - far.r, far.p.y - far.r);
+    X.lineTo(near.p.x - near.r, near.p.y - near.r);
+    X.lineTo(near.p.x - near.r, near.p.y + near.r);
+    X.lineTo(far.p.x - far.r, far.p.y + far.r);
+    X.fill();
+    // Right wall
+    X.beginPath();
+    X.moveTo(far.p.x + far.r, far.p.y - far.r);
+    X.lineTo(near.p.x + near.r, near.p.y - near.r);
+    X.lineTo(near.p.x + near.r, near.p.y + near.r);
+    X.lineTo(far.p.x + far.r, far.p.y + far.r);
+    X.fill();
+    // Floor
+    X.globalAlpha = a * 0.05;
+    X.beginPath();
+    X.moveTo(far.p.x - far.r, far.p.y + far.r);
+    X.lineTo(near.p.x - near.r, near.p.y + near.r);
+    X.lineTo(near.p.x + near.r, near.p.y + near.r);
+    X.lineTo(far.p.x + far.r, far.p.y + far.r);
+    X.fill();
+
+    // Wireframe ring every few segs
+    if (i % 3 === 0) {
+      X.globalAlpha = a * 0.6;
+      X.strokeStyle = rgb(col, 1);
+      X.lineWidth = 1;
+      // Octagon ring
+      X.beginPath();
+      for (let j = 0; j <= 8; j++) {
+        const angle = (j / 8) * Math.PI * 2;
+        const rx = far.p.x + Math.cos(angle) * far.r;
+        const ry = far.p.y + Math.sin(angle) * far.r * 0.9;
+        j === 0 ? X.moveTo(rx, ry) : X.lineTo(rx, ry);
+      }
+      X.stroke();
+    }
+
+    // Rail lines (left + right + top + bottom)
+    if (i % 2 === 0) {
+      X.globalAlpha = a * 0.25;
+      X.strokeStyle = rgb(col, 1);
+      X.lineWidth = 0.5;
+      // Left rail
+      X.beginPath();
+      X.moveTo(far.p.x - far.r, far.p.y);
+      X.lineTo(near.p.x - near.r, near.p.y);
+      X.stroke();
+      // Right rail
+      X.beginPath();
+      X.moveTo(far.p.x + far.r, far.p.y);
+      X.lineTo(near.p.x + near.r, near.p.y);
+      X.stroke();
+      // Floor rail
+      X.beginPath();
+      X.moveTo(far.p.x, far.p.y + far.r);
+      X.lineTo(near.p.x, near.p.y + near.r);
+      X.stroke();
+    }
+  }
+  X.globalAlpha = 1;
+}
+
+function drawObs(o) {
+  if (o.z < 0 || o.z > VISIBLE * SEG_DEPTH * 0.15) return;
+
+  // Get tunnel center at obstacle depth
+  let cx = 0;
+  const segIdx = Math.floor(o.z / (SEG_DEPTH * 0.12));
+  for (let i = 0; i <= Math.min(segIdx, SEGS.length - 1); i++) {
+    cx += (SEGS[i]?.curve || 0) * 0.06;
+  }
+
+  const z = o.z * 0.12 + CAM_Z_OFF;
+  const p = project(cx, 0, z);
+  const r = p.s * TUNNEL_R;
+  const alpha = Math.max(0, Math.min(1, 1 - (o.z * 0.12) / (VISIBLE * SEG_DEPTH * 0.012)));
+
+  if (o.hit) return;
+
+  X.globalAlpha = alpha * 0.8;
+
+  if (o.type === 'gate') {
+    // Ring gate — fly through
+    X.strokeStyle = rgb(o.color, 1);
+    X.lineWidth = 2;
+    X.beginPath();
+    for (let j = 0; j <= 8; j++) {
+      const angle = (j / 8) * Math.PI * 2;
+      const rx = p.x + Math.cos(angle) * r * 0.7;
+      const ry = p.y + Math.sin(angle) * r * 0.65;
+      j === 0 ? X.moveTo(rx, ry) : X.lineTo(rx, ry);
+    }
+    X.stroke();
+
+    // Inner glow
+    X.globalAlpha = alpha * 0.1;
+    X.fillStyle = rgb(o.color, 1);
+    X.beginPath();
+    for (let j = 0; j <= 8; j++) {
+      const angle = (j / 8) * Math.PI * 2;
+      const rx = p.x + Math.cos(angle) * r * 0.6;
+      const ry = p.y + Math.sin(angle) * r * 0.55;
+      j === 0 ? X.moveTo(rx, ry) : X.lineTo(rx, ry);
+    }
+    X.fill();
+  } else {
+    // Wall obstacles
+    X.fillStyle = rgb(o.color, 0.6);
+    X.strokeStyle = rgb(o.color, 1);
+    X.lineWidth = 1.5;
+
+    const wallH = r * 1.8;
+    const wallW = r * 0.9;
+
+    if (o.type === 'wall-left') {
+      X.fillRect(p.x - r, p.y - wallH/2, wallW, wallH);
+      X.strokeRect(p.x - r, p.y - wallH/2, wallW, wallH);
+      // Hazard stripes
+      X.globalAlpha = alpha * 0.3;
+      for (let s = 0; s < wallH; s += 8) {
+        X.fillStyle = s % 16 < 8 ? rgb(o.color, 1) : 'rgba(0,0,0,0.3)';
+        X.fillRect(p.x - r, p.y - wallH/2 + s, wallW, 4);
+      }
+    } else if (o.type === 'wall-right') {
+      X.fillRect(p.x + r - wallW, p.y - wallH/2, wallW, wallH);
+      X.strokeRect(p.x + r - wallW, p.y - wallH/2, wallW, wallH);
+      X.globalAlpha = alpha * 0.3;
+      for (let s = 0; s < wallH; s += 8) {
+        X.fillStyle = s % 16 < 8 ? rgb(o.color, 1) : 'rgba(0,0,0,0.3)';
+        X.fillRect(p.x + r - wallW, p.y - wallH/2 + s, wallW, 4);
+      }
+    } else if (o.type === 'wall-center') {
+      const cw = r * 0.9;
+      X.fillRect(p.x - cw/2, p.y - wallH/2, cw, wallH);
+      X.strokeRect(p.x - cw/2, p.y - wallH/2, cw, wallH);
+    }
+  }
+
+  X.globalAlpha = 1;
+}
+
+function drawShip() {
+  if (state === 'dead' && deadTimer > 5) return;
+
+  const sx = W/2 + px * 80;
+  const sy = H * 0.65;
+
+  X.save();
+  X.translate(sx, sy);
+  X.rotate(tilt * 0.15);
+
+  // Engine glow
+  const glow = warping ? 20 : 10;
+  X.globalAlpha = 0.15;
+  X.fillStyle = warping ? '#facc15' : '#6366f1';
+  X.beginPath();
+  X.ellipse(0, 12, 8, glow, 0, 0, Math.PI * 2);
+  X.fill();
+  X.globalAlpha = 1;
+
+  // Ship body (arrow/chevron shape)
+  X.fillStyle = '#c7d2fe';
+  X.strokeStyle = '#6366f1';
+  X.lineWidth = 1.5;
+  X.beginPath();
+  X.moveTo(0, -14);      // nose
+  X.lineTo(-12, 8);      // left wing
+  X.lineTo(-4, 4);       // left notch
+  X.lineTo(0, 10);       // tail center
+  X.lineTo(4, 4);        // right notch
+  X.lineTo(12, 8);       // right wing
+  X.closePath();
+  X.fill();
+  X.stroke();
+
+  // Cockpit
+  X.fillStyle = '#6366f1';
+  X.beginPath();
+  X.ellipse(0, -2, 3, 5, 0, 0, Math.PI * 2);
+  X.fill();
+
+  // Wing accents
+  X.strokeStyle = warping ? '#facc15' : '#818cf8';
+  X.lineWidth = 1;
+  X.beginPath();
+  X.moveTo(-3, 0);
+  X.lineTo(-10, 7);
+  X.stroke();
+  X.beginPath();
+  X.moveTo(3, 0);
+  X.lineTo(10, 7);
+  X.stroke();
+
+  X.restore();
+}
+
+function drawHUD() {
+  if (state === 'title') return;
+
+  // Score
+  X.font = '20px "Press Start 2P"';
+  X.textAlign = 'center';
+  X.fillStyle = 'rgba(0,0,0,0.3)';
+  X.fillText(score, W/2 + 1, 38);
+  X.fillStyle = '#e4eaf4';
+  X.fillText(score, W/2, 37);
+
+  // Speed bar
+  const barW = 60;
+  const barH = 4;
+  const barX = W - barW - 16;
+  const barY = 16;
+  X.fillStyle = 'rgba(255,255,255,0.08)';
+  X.fillRect(barX, barY, barW, barH);
+  const fill = Math.min(1, speed / 1.5);
+  X.fillStyle = warping ? '#facc15' : '#6366f1';
+  X.fillRect(barX, barY, barW * fill, barH);
+
+  X.font = '5px "Press Start 2P"';
+  X.textAlign = 'right';
+  X.fillStyle = '#4a5a7a';
+  X.fillText('SPEED', barX + barW, barY + 12);
+
+  // Warp indicator
+  if (warping) {
+    X.font = '8px "Press Start 2P"';
+    X.textAlign = 'center';
+    X.fillStyle = '#facc15';
+    X.globalAlpha = 0.6 + Math.sin(frame * 0.4) * 0.4;
+    X.fillText('WARP', W/2, 58);
+    X.globalAlpha = 1;
+  }
+}
+
+function drawTitle() {
+  X.fillStyle = 'rgba(2,2,8,0.75)';
+  X.fillRect(0, 0, W, H);
+
+  X.textAlign = 'center';
+
+  // Title
+  X.font = '22px "Press Start 2P"';
+  X.fillStyle = '#6366f1';
+  X.shadowColor = '#6366f1';
+  X.shadowBlur = 30;
+  X.fillText('WARP CORE', W/2, H * 0.32);
+  X.shadowBlur = 0;
+
+  // Subtitle
+  X.font = '7px "Press Start 2P"';
+  X.fillStyle = '#6b7a94';
+  X.fillText('Fly through the tunnel. Dodge walls.', W/2, H * 0.38);
+  X.fillText('Survive the warp.', W/2, H * 0.38 + 16);
+
+  // Start prompt
+  X.font = '9px "Press Start 2P"';
+  X.fillStyle = '#6366f1';
+  X.globalAlpha = 0.5 + Math.sin(frame * 0.06) * 0.5;
+  X.fillText('[ TAP / SPACE ]', W/2, H * 0.52);
+  X.globalAlpha = 1;
+
+  // Controls
+  X.font = '6px "Press Start 2P"';
+  X.fillStyle = '#3a4a6a';
+  X.fillText('A/D or ARROWS = STEER', W/2, H * 0.62);
+  X.fillText('DODGE WALLS  ·  FLY THROUGH GATES', W/2, H * 0.62 + 14);
+
+  // High score
+  if (best > 0) {
+    X.font = '8px "Press Start 2P"';
+    X.fillStyle = '#30cf43';
+    X.fillText('BEST: ' + best, W/2, H * 0.74);
+  }
+}
+
+function drawDeath() {
+  const a = Math.min(0.9, (deadTimer - 25) / 30);
+  X.globalAlpha = a;
+
+  // Panel
+  X.fillStyle = 'rgba(2,2,8,0.93)';
+  roundRect(X, W/2 - 120, H * 0.28, 240, 200, 12);
+  X.fill();
+  X.strokeStyle = 'rgba(99,102,241,0.2)';
+  X.lineWidth = 1;
+  roundRect(X, W/2 - 120, H * 0.28, 240, 200, 12);
+  X.stroke();
+
+  X.globalAlpha = 1;
+  X.textAlign = 'center';
+
+  const top = H * 0.28;
+
+  X.font = '14px "Press Start 2P"';
+  X.fillStyle = '#ff6b6b';
+  X.fillText('WARP FAILED', W/2, top + 40);
+
+  X.font = '7px "Press Start 2P"';
+  X.fillStyle = '#6b7a94';
+  X.fillText('Hull breach detected', W/2, top + 58);
+
+  // Score
+  X.font = '7px "Press Start 2P"';
+  X.fillStyle = '#4a5a7a';
+  X.fillText('DISTANCE', W/2, top + 90);
+  X.font = '22px "Press Start 2P"';
+  X.fillStyle = '#6366f1';
+  X.fillText(score, W/2, top + 118);
+
+  // Best
+  X.font = '7px "Press Start 2P"';
+  X.fillStyle = '#4a5a7a';
+  X.fillText('BEST', W/2, top + 145);
+  X.font = '12px "Press Start 2P"';
+  X.fillStyle = score >= best && score > 0 ? '#facc15' : '#30cf43';
+  X.fillText(best, W/2, top + 165);
+
+  if (score >= best && score > 0) {
+    X.font = '7px "Press Start 2P"';
+    X.fillStyle = '#facc15';
+    X.fillText('NEW RECORD!', W/2, top + 185);
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+// --- Loop ---
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

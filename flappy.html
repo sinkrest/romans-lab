@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ship It Bird — Roman's Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background: #0a0a1a;
+      background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(10,10,26,1) 0%, #050510 100%);
+      color: #e4eaf4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .game-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 2px rgba(99,102,241,0.3),
+        0 0 0 4px rgba(10,10,26,0.8),
+        0 8px 40px rgba(0,0,0,0.6),
+        0 0 60px rgba(99,102,241,0.06);
+    }
+
+    canvas {
+      display: block;
+      background: #0f1628;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 8px;
+      color: rgba(99,102,241,0.5);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+    }
+
+    .title-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15,22,40,0.92);
+      backdrop-filter: blur(4px);
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+
+    .title-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .title-screen h1 {
+      font-size: 18px;
+      color: #6366f1;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+
+    .title-screen .sub {
+      font-size: 7px;
+      color: #8a9dba;
+      margin-bottom: 32px;
+      letter-spacing: 0.08em;
+    }
+
+    .title-screen .start {
+      font-size: 9px;
+      color: #6366f1;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    .title-screen .controls {
+      font-size: 6px;
+      color: #4a5a7a;
+      margin-top: 16px;
+      line-height: 2;
+    }
+
+    .title-screen .high {
+      font-size: 7px;
+      color: #30cf43;
+      margin-top: 20px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrap">
+  <canvas id="c" width="320" height="480"></canvas>
+  <div class="hint">SPACE / TAP TO FLAP</div>
+
+  <div class="title-screen" id="title">
+    <h1>SHIP IT BIRD</h1>
+    <div class="sub">Navigate the pipeline. Ship features. Don't crash.</div>
+    <div class="start">[ SPACE / TAP TO START ]</div>
+    <div class="controls">
+      SPACE / CLICK / TAP = FLAP<br>
+      DODGE THE PIPES. SHIP FEATURES.
+    </div>
+    <div class="high" id="title-high"></div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// Ship It Bird — Flappy Bird for Product People
+// ============================================
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const titleScreen = document.getElementById('title');
+const titleHigh = document.getElementById('title-high');
+
+const W = 320;
+const H = 480;
+
+// --- Game State ---
+const G = {
+  bird: { x: 80, y: 240, vy: 0, r: 0 },
+  pipes: [],
+  particles: [],
+  stars: [],
+  score: 0,
+  best: parseInt(localStorage.getItem('sib-best') || '0'),
+  state: 'title', // title | playing | dead
+  frame: 0,
+  flash: 0,
+  ground: { x: 0 },
+  speed: 2,
+  deadTimer: 0,
+  combo: 0,
+  comboText: '',
+  comboTimer: 0,
+};
+
+// --- Product-themed messages ---
+const COMBO_MSGS = [
+  '', 'Nice ship!', 'On a roll!', 'Hot streak!', 'Deploying!',
+  'Pipeline clear!', 'Sprint master!', 'Ship machine!', 'Legendary!', 'GOD MODE!'
+];
+
+const MILESTONE_MSGS = {
+  5: 'MVP shipped!',
+  10: 'Product-market fit!',
+  15: 'Series A!',
+  20: 'Growth mode!',
+  30: 'IPO!',
+  50: 'Unicorn!',
+};
+
+// --- Init stars ---
+for (let i = 0; i < 40; i++) {
+  G.stars.push({
+    x: Math.random() * W,
+    y: Math.random() * H * 0.7,
+    size: Math.random() * 1.5 + 0.5,
+    speed: Math.random() * 0.3 + 0.1,
+    alpha: Math.random() * 0.5 + 0.2,
+  });
+}
+
+// --- Physics ---
+const GRAVITY = 0.35;
+const FLAP = -6.5;
+const PIPE_GAP = 130;
+const PIPE_WIDTH = 48;
+const PIPE_SPEED = 2;
+const PIPE_INTERVAL = 100; // frames
+const BIRD_SIZE = 14;
+const GROUND_H = 50;
+
+// --- Colors ---
+const COL = {
+  bg: '#0f1628',
+  pipe: '#6366f1',
+  pipeEdge: '#818cf8',
+  pipeDark: '#3730a3',
+  bird: '#facc15',
+  birdWing: '#f59e0b',
+  birdEye: '#1e1b4b',
+  ground: '#1a1e36',
+  groundLine: '#2a2e56',
+  groundDot: 'rgba(99,102,241,0.15)',
+  star: '#6366f1',
+  text: '#e4eaf4',
+  score: '#6366f1',
+  dead: 'rgba(255,50,50,0.3)',
+  gold: '#facc15',
+  green: '#30cf43',
+};
+
+// --- Input ---
+function flap() {
+  if (G.state === 'title') {
+    startGame();
+    return;
+  }
+  if (G.state === 'dead') {
+    if (G.deadTimer > 30) {
+      G.state = 'title';
+      titleScreen.classList.remove('hidden');
+      if (G.best > 0) titleHigh.textContent = 'BEST: ' + G.best;
+    }
+    return;
+  }
+  G.bird.vy = FLAP;
+  // Wing flap particles
+  for (let i = 0; i < 4; i++) {
+    G.particles.push({
+      x: G.bird.x - 6,
+      y: G.bird.y + 4,
+      vx: -Math.random() * 2 - 1,
+      vy: Math.random() * 2 - 1,
+      life: 15 + Math.random() * 10,
+      maxLife: 25,
+      color: COL.birdWing,
+      size: 3,
+    });
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); flap(); }
+});
+canvas.addEventListener('click', flap);
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, { passive: false });
+
+// --- Game Logic ---
+function startGame() {
+  G.bird = { x: 80, y: 240, vy: 0, r: 0 };
+  G.pipes = [];
+  G.particles = [];
+  G.score = 0;
+  G.frame = 0;
+  G.flash = 0;
+  G.speed = 2;
+  G.combo = 0;
+  G.comboText = '';
+  G.comboTimer = 0;
+  G.state = 'playing';
+  G.deadTimer = 0;
+  titleScreen.classList.add('hidden');
+}
+
+function die() {
+  G.state = 'dead';
+  G.deadTimer = 0;
+  G.flash = 8;
+  if (G.score > G.best) {
+    G.best = G.score;
+    localStorage.setItem('sib-best', G.best.toString());
+  }
+  // Death burst
+  for (let i = 0; i < 12; i++) {
+    const angle = (Math.PI * 2 * i) / 12;
+    G.particles.push({
+      x: G.bird.x,
+      y: G.bird.y,
+      vx: Math.cos(angle) * (2 + Math.random() * 2),
+      vy: Math.sin(angle) * (2 + Math.random() * 2),
+      life: 20 + Math.random() * 15,
+      maxLife: 35,
+      color: COL.bird,
+      size: 4,
+    });
+  }
+}
+
+function update() {
+  G.frame++;
+
+  if (G.state === 'dead') {
+    G.deadTimer++;
+    // Bird falls
+    G.bird.vy += GRAVITY;
+    G.bird.y += G.bird.vy;
+    G.bird.r = Math.min(G.bird.r + 0.08, Math.PI / 2);
+    if (G.bird.y > H - GROUND_H - BIRD_SIZE) {
+      G.bird.y = H - GROUND_H - BIRD_SIZE;
+      G.bird.vy = 0;
+    }
+    updateParticles();
+    return;
+  }
+
+  if (G.state !== 'playing') return;
+
+  // Bird physics
+  G.bird.vy += GRAVITY;
+  G.bird.y += G.bird.vy;
+  G.bird.r = Math.max(-0.4, Math.min(G.bird.vy * 0.06, Math.PI / 4));
+
+  // Ceiling
+  if (G.bird.y < BIRD_SIZE) {
+    G.bird.y = BIRD_SIZE;
+    G.bird.vy = 0;
+  }
+
+  // Ground
+  if (G.bird.y > H - GROUND_H - BIRD_SIZE) {
+    die();
+    return;
+  }
+
+  // Speed ramp
+  G.speed = 2 + Math.min(G.score * 0.04, 1.5);
+
+  // Ground scroll
+  G.ground.x = (G.ground.x - G.speed) % 24;
+
+  // Stars
+  G.stars.forEach(s => {
+    s.x -= s.speed;
+    if (s.x < -2) { s.x = W + 2; s.y = Math.random() * H * 0.7; }
+  });
+
+  // Spawn pipes
+  if (G.frame % Math.max(70, PIPE_INTERVAL - G.score * 2) === 0) {
+    const minY = 80;
+    const maxY = H - GROUND_H - PIPE_GAP - 80;
+    const gapY = minY + Math.random() * (maxY - minY);
+    G.pipes.push({
+      x: W + PIPE_WIDTH,
+      gapY: gapY,
+      scored: false,
+      glow: 0,
+    });
+  }
+
+  // Move + collide pipes
+  for (let i = G.pipes.length - 1; i >= 0; i--) {
+    const p = G.pipes[i];
+    p.x -= G.speed;
+    if (p.glow > 0) p.glow -= 0.05;
+
+    // Remove offscreen
+    if (p.x < -PIPE_WIDTH) {
+      G.pipes.splice(i, 1);
+      continue;
+    }
+
+    // Score
+    if (!p.scored && p.x + PIPE_WIDTH < G.bird.x) {
+      p.scored = true;
+      p.glow = 1;
+      G.score++;
+      G.combo++;
+      G.comboTimer = 60;
+
+      // Milestone check
+      if (MILESTONE_MSGS[G.score]) {
+        G.comboText = MILESTONE_MSGS[G.score];
+        G.comboTimer = 90;
+      } else if (G.combo >= 2 && G.combo < COMBO_MSGS.length) {
+        G.comboText = COMBO_MSGS[G.combo];
+      } else if (G.combo >= COMBO_MSGS.length) {
+        G.comboText = COMBO_MSGS[COMBO_MSGS.length - 1];
+      }
+
+      // Score particles
+      for (let j = 0; j < 6; j++) {
+        G.particles.push({
+          x: G.bird.x + 20,
+          y: G.bird.y - 10,
+          vx: Math.random() * 3 - 1,
+          vy: -Math.random() * 3 - 1,
+          life: 20 + Math.random() * 10,
+          maxLife: 30,
+          color: G.score % 5 === 0 ? COL.gold : COL.green,
+          size: G.score % 5 === 0 ? 5 : 3,
+        });
+      }
+    }
+
+    // Collision (AABB)
+    const bx = G.bird.x - BIRD_SIZE * 0.7;
+    const by = G.bird.y - BIRD_SIZE * 0.7;
+    const bw = BIRD_SIZE * 1.4;
+    const bh = BIRD_SIZE * 1.4;
+
+    // Top pipe
+    if (bx + bw > p.x && bx < p.x + PIPE_WIDTH && by < p.gapY) {
+      die();
+      return;
+    }
+    // Bottom pipe
+    if (bx + bw > p.x && bx < p.x + PIPE_WIDTH && by + bh > p.gapY + PIPE_GAP) {
+      die();
+      return;
+    }
+  }
+
+  // Combo decay
+  if (G.comboTimer > 0) {
+    G.comboTimer--;
+    if (G.comboTimer === 0) {
+      G.combo = 0;
+      G.comboText = '';
+    }
+  }
+
+  updateParticles();
+}
+
+function updateParticles() {
+  for (let i = G.particles.length - 1; i >= 0; i--) {
+    const p = G.particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    if (p.life <= 0) G.particles.splice(i, 1);
+  }
+}
+
+// --- Rendering ---
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#0a0e20');
+  bgGrad.addColorStop(0.6, '#0f1628');
+  bgGrad.addColorStop(1, '#141830');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  G.stars.forEach(s => {
+    ctx.globalAlpha = s.alpha + Math.sin(G.frame * 0.03 + s.x) * 0.15;
+    ctx.fillStyle = COL.star;
+    ctx.fillRect(Math.floor(s.x), Math.floor(s.y), s.size, s.size);
+  });
+  ctx.globalAlpha = 1;
+
+  // Pipes
+  G.pipes.forEach(p => {
+    drawPipe(p.x, 0, p.gapY, 'top', p.glow);
+    drawPipe(p.x, p.gapY + PIPE_GAP, H - GROUND_H - p.gapY - PIPE_GAP, 'bottom', p.glow);
+  });
+
+  // Particles
+  G.particles.forEach(p => {
+    const alpha = p.life / p.maxLife;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    const s = p.size * alpha;
+    ctx.fillRect(p.x - s/2, p.y - s/2, s, s);
+  });
+  ctx.globalAlpha = 1;
+
+  // Bird
+  drawBird();
+
+  // Ground
+  drawGround();
+
+  // Flash (death)
+  if (G.flash > 0) {
+    ctx.globalAlpha = G.flash / 8 * 0.4;
+    ctx.fillStyle = '#ff3333';
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+    G.flash--;
+  }
+
+  // Score
+  if (G.state === 'playing' || G.state === 'dead') {
+    // Score number
+    ctx.font = '28px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillText(G.score, W/2 + 2, 52);
+    ctx.fillStyle = COL.text;
+    ctx.fillText(G.score, W/2, 50);
+
+    // Combo text
+    if (G.comboText && G.comboTimer > 0) {
+      const alpha = Math.min(1, G.comboTimer / 20);
+      ctx.globalAlpha = alpha;
+      ctx.font = '8px "Press Start 2P"';
+      ctx.fillStyle = COL.gold;
+      ctx.fillText(G.comboText, W/2, 72);
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // Death overlay
+  if (G.state === 'dead' && G.deadTimer > 20) {
+    const alpha = Math.min(0.85, (G.deadTimer - 20) / 30);
+    ctx.globalAlpha = alpha;
+
+    // Panel bg
+    ctx.fillStyle = 'rgba(10,14,32,0.95)';
+    roundRect(ctx, W/2 - 110, 140, 220, 180, 12);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(99,102,241,0.3)';
+    ctx.lineWidth = 1;
+    roundRect(ctx, W/2 - 110, 140, 220, 180, 12);
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+
+    // Game over text
+    ctx.font = '14px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ff6b6b';
+    ctx.fillText('CRASHED', W/2, 178);
+
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = '#8a9dba';
+    ctx.fillText('Pipeline blocked', W/2, 198);
+
+    // Score
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = '#6b7a94';
+    ctx.fillText('SHIPPED', W/2, 228);
+    ctx.font = '20px "Press Start 2P"';
+    ctx.fillStyle = COL.score;
+    ctx.fillText(G.score, W/2, 254);
+
+    // Best
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = '#6b7a94';
+    ctx.fillText('BEST', W/2, 280);
+    ctx.font = '12px "Press Start 2P"';
+    ctx.fillStyle = G.score >= G.best ? COL.gold : COL.green;
+    ctx.fillText(G.best, W/2, 298);
+
+    if (G.score >= G.best && G.score > 0) {
+      ctx.font = '7px "Press Start 2P"';
+      ctx.fillStyle = COL.gold;
+      ctx.fillText('NEW RECORD!', W/2, 316);
+    }
+  }
+}
+
+function drawPipe(x, y, h, type, glow) {
+  if (h <= 0) return;
+
+  // Pipe body
+  const grad = ctx.createLinearGradient(x, 0, x + PIPE_WIDTH, 0);
+  grad.addColorStop(0, COL.pipeDark);
+  grad.addColorStop(0.3, COL.pipe);
+  grad.addColorStop(0.7, COL.pipe);
+  grad.addColorStop(1, COL.pipeDark);
+  ctx.fillStyle = grad;
+  ctx.fillRect(x, y, PIPE_WIDTH, h);
+
+  // Pipe cap
+  const capH = 8;
+  const capW = PIPE_WIDTH + 8;
+  const capX = x - 4;
+  const capY = type === 'top' ? y + h - capH : y;
+
+  const capGrad = ctx.createLinearGradient(capX, 0, capX + capW, 0);
+  capGrad.addColorStop(0, COL.pipeDark);
+  capGrad.addColorStop(0.2, COL.pipeEdge);
+  capGrad.addColorStop(0.8, COL.pipeEdge);
+  capGrad.addColorStop(1, COL.pipeDark);
+  ctx.fillStyle = capGrad;
+  ctx.fillRect(capX, capY, capW, capH);
+
+  // Highlight line
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(x + 6, y, 3, h);
+
+  // Glow on score
+  if (glow > 0) {
+    ctx.globalAlpha = glow * 0.2;
+    ctx.fillStyle = COL.pipeEdge;
+    ctx.fillRect(x - 2, y, PIPE_WIDTH + 4, h);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function drawBird() {
+  ctx.save();
+  ctx.translate(G.bird.x, G.bird.y);
+  ctx.rotate(G.bird.r);
+
+  // Body
+  ctx.fillStyle = COL.bird;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, BIRD_SIZE, BIRD_SIZE * 0.8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Wing
+  const wingFlap = Math.sin(G.frame * 0.4) * 6;
+  ctx.fillStyle = COL.birdWing;
+  ctx.beginPath();
+  ctx.ellipse(-4, wingFlap > 0 ? -4 : 4, 8, 5 + Math.abs(wingFlap) * 0.3, wingFlap * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Eye
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(7, -4, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = COL.birdEye;
+  ctx.beginPath();
+  ctx.arc(8.5, -3.5, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Beak
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.moveTo(12, -1);
+  ctx.lineTo(20, 2);
+  ctx.lineTo(12, 5);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawGround() {
+  // Ground fill
+  ctx.fillStyle = COL.ground;
+  ctx.fillRect(0, H - GROUND_H, W, GROUND_H);
+
+  // Top line
+  ctx.fillStyle = COL.groundLine;
+  ctx.fillRect(0, H - GROUND_H, W, 2);
+
+  // Grid dots
+  ctx.fillStyle = COL.groundDot;
+  for (let x = G.ground.x; x < W; x += 24) {
+    for (let y = H - GROUND_H + 12; y < H; y += 12) {
+      ctx.fillRect(x, y, 2, 2);
+    }
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// --- Game Loop ---
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// --- Start ---
+if (G.best > 0) titleHigh.textContent = 'BEST: ' + G.best;
+loop();
+</script>
+</body>
+</html>

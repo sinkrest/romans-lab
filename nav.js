@@ -1,6 +1,6 @@
 (function () {
   const APPS = [
-    { label: '⚡ AI OS', href: 'index.html', match: ['', 'index.html'] },
+    { label: 'AI OS', href: 'index.html', match: ['', 'index.html'] },
     { label: '🐍 Snake \'99', href: 'snake.html', match: ['snake.html'] },
     { label: '🧱 Tetris', href: 'tetris.html', match: ['tetris.html'] },
     { label: '🧪 Lab', href: 'https://sinkrest.github.io/lab/', match: [], external: true },
@@ -18,7 +18,7 @@
       align-items: center;
       gap: .4rem;
       padding: .65rem 1.2rem;
-      background: rgba(11, 22, 40, 0.94);
+      background: rgba(7, 17, 13, 0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(255,255,255,0.06);
@@ -33,20 +33,20 @@
       text-decoration: none;
       font-size: .82rem;
       font-weight: 600;
-      color: #8a9dba;
+      color: rgba(245,255,249,0.56);
       border: 1px solid transparent;
       transition: color .2s, border-color .2s, background .2s;
       white-space: nowrap;
     }
     #aios-nav a:hover {
-      color: #27c0e7;
-      border-color: rgba(39,192,231,0.3);
-      background: rgba(39,192,231,0.08);
+      color: #a7f3d0;
+      border-color: rgba(52,211,153,0.34);
+      background: rgba(52,211,153,0.1);
     }
     #aios-nav a.aios-active {
-      color: #27c0e7;
-      border-color: rgba(39,192,231,0.35);
-      background: rgba(39,192,231,0.1);
+      color: #a7f3d0;
+      border-color: rgba(52,211,153,0.4);
+      background: rgba(52,211,153,0.12);
     }
     #aios-nav a.aios-ext::after {
       content: ' ↗';

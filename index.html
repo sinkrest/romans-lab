@@ -13,10 +13,24 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #07110d;
+      --panel: #0b1511;
+      --panel-strong: #0d1a14;
+      --line: rgba(255,255,255,0.08);
+      --text: #f5fff9;
+      --muted: rgba(245,255,249,0.56);
+      --faint: rgba(245,255,249,0.36);
+      --emerald: #34d399;
+      --emerald-soft: rgba(52,211,153,0.12);
+      --cyan: #22d3ee;
+      --amber: #f5c76b;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #080810;
-      color: #e4eaf4;
+      background-color: var(--bg);
+      color: var(--text);
       height: 100dvh;
       display: flex;
       flex-direction: column;
@@ -29,17 +43,17 @@
       align-items: center;
       gap: .3rem;
       padding: .6rem 1.2rem;
-      background: rgba(11,22,40,0.96);
+      background: rgba(7,17,13,0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid var(--line);
       flex-shrink: 0;
     }
 
     .nav-logo {
       font-size: .82rem;
       font-weight: 800;
-      color: #6366f1;
+      color: var(--emerald);
       letter-spacing: .07em;
       margin-right: .5rem;
       white-space: nowrap;
@@ -50,7 +64,7 @@
       border-radius: 7px;
       border: 1px solid transparent;
       background: none;
-      color: #8a9dba;
+      color: var(--muted);
       font-size: .82rem;
       font-weight: 600;
       cursor: pointer;
@@ -60,15 +74,15 @@
     }
 
     .nav-tab:hover {
-      color: #6366f1;
-      border-color: rgba(99,102,241,0.3);
-      background: rgba(99,102,241,0.08);
+      color: var(--emerald);
+      border-color: rgba(52,211,153,0.32);
+      background: var(--emerald-soft);
     }
 
     .nav-tab.active {
-      color: #6366f1;
-      border-color: rgba(99,102,241,0.38);
-      background: rgba(99,102,241,0.12);
+      color: var(--emerald);
+      border-color: rgba(52,211,153,0.4);
+      background: var(--emerald-soft);
     }
 
     .nav-divider {
@@ -105,7 +119,10 @@
 
     /* ── Home ──────────────────────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, #080810 0%, #0f0f1a 40%, #1a1a2e 70%, #312e81 100%);
+      background:
+        linear-gradient(115deg, rgba(52,211,153,0.08), transparent 34%, rgba(34,211,238,0.05) 78%, transparent),
+        radial-gradient(circle at 74% 18%, rgba(52,211,153,0.12), transparent 32%),
+        linear-gradient(135deg, #07110d 0%, #091712 45%, #0b2118 100%);
       padding: 2rem 2rem 1.8rem;
       position: relative;
       overflow: hidden;
@@ -117,7 +134,7 @@
       position: absolute;
       top: -50%; right: -15%;
       width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -141,7 +158,7 @@
       position: absolute;
       inset: -4px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(99,102,241,0.5), rgba(139,92,246,0.3), rgba(99,102,241,0.1));
+      background: linear-gradient(135deg, rgba(52,211,153,0.5), rgba(34,211,238,0.26), rgba(52,211,153,0.08));
       pointer-events: none;
     }
 
@@ -150,7 +167,7 @@
       position: absolute;
       inset: -24px;
       border-radius: 28px;
-      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(52,211,153,0.15) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -159,7 +176,7 @@
       height: 112px;
       border-radius: 14px;
       object-fit: cover;
-      border: 3px solid #0f0f1a;
+      border: 3px solid var(--panel);
       position: relative;
       display: block;
       z-index: 1;
@@ -177,10 +194,10 @@
       line-height: 1.2;
     }
 
-    .hero-text h1 span { color: #6366f1; }
+    .hero-text h1 span { color: var(--emerald); }
 
     .hero-text p {
-      color: #94a7c8;
+      color: var(--muted);
       font-size: .95rem;
       line-height: 1.5;
       margin: 0;
@@ -188,9 +205,9 @@
 
     .badge {
       display: inline-block;
-      background: rgba(99,102,241,0.15);
-      border: 1px solid rgba(99,102,241,0.3);
-      color: #6366f1;
+      background: var(--emerald-soft);
+      border: 1px solid rgba(52,211,153,0.28);
+      color: #a7f3d0;
       font-size: .65rem;
       font-weight: 600;
       letter-spacing: .08em;
@@ -210,13 +227,13 @@
     }
 
     .card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(11,21,17,0.9);
+      border: 1px solid var(--line);
       backdrop-filter: blur(8px);
-      border-radius: 14px;
+      border-radius: 8px;
       padding: 1.6rem;
       text-decoration: none;
-      color: #e4eaf4;
+      color: var(--text);
       cursor: pointer;
       transition: border-color .22s, transform .22s, box-shadow .22s;
       position: relative;
@@ -228,22 +245,22 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: linear-gradient(90deg, #6366f1, #312e81);
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
       opacity: 0;
       transition: opacity .22s;
     }
 
     .card:hover {
-      border-color: rgba(99,102,241,0.4);
+      border-color: rgba(52,211,153,0.36);
       transform: translateY(-4px);
-      box-shadow: 0 8px 28px rgba(99,102,241,0.1);
+      box-shadow: 0 8px 28px rgba(52,211,153,0.08);
     }
 
     .card:hover::before { opacity: 1; }
 
     .card .icon { font-size: 2rem; margin-bottom: .8rem; }
     .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: .45rem; }
-    .card p { font-size: .88rem; color: #8a9dba; line-height: 1.55; }
+    .card p { font-size: .88rem; color: var(--muted); line-height: 1.55; }
 
     .card .tag {
       display: inline-block;
@@ -254,9 +271,9 @@
       letter-spacing: .06em;
       padding: .22rem .65rem;
       border-radius: 4px;
-      background: rgba(99,102,241,0.1);
-      color: #6366f1;
-      border: 1px solid rgba(99,102,241,0.2);
+      background: var(--emerald-soft);
+      color: #a7f3d0;
+      border: 1px solid rgba(52,211,153,0.2);
     }
 
     /* ── Ghost Creator Suite ──────────────────────────────── */
@@ -273,16 +290,16 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .12em;
-      color: #30cf43;
+      color: var(--emerald);
       white-space: nowrap;
     }
 
     .suite-header-count {
       font-size: .68rem;
       font-weight: 600;
-      color: rgba(48,207,67,0.6);
-      background: rgba(48,207,67,0.08);
-      border: 1px solid rgba(48,207,67,0.2);
+      color: rgba(52,211,153,0.7);
+      background: var(--emerald-soft);
+      border: 1px solid rgba(52,211,153,0.2);
       padding: .1rem .45rem;
       border-radius: 20px;
     }
@@ -291,7 +308,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, rgba(48,207,67,0.25), transparent);
+      background: linear-gradient(90deg, rgba(52,211,153,0.25), transparent);
     }
 
     .suite-divider {
@@ -307,7 +324,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .12em;
-      color: rgba(99,102,241,0.6);
+      color: rgba(52,211,153,0.64);
       white-space: nowrap;
     }
 
@@ -315,45 +332,45 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, rgba(99,102,241,0.2), transparent);
+      background: linear-gradient(90deg, rgba(52,211,153,0.2), transparent);
     }
 
     /* Ghost card variant — green accent */
     .card.ghost-card::before {
-      background: linear-gradient(90deg, #30cf43, #22a832);
+      background: linear-gradient(90deg, var(--emerald), #16a34a);
     }
 
     .card.ghost-card:hover {
-      border-color: rgba(48,207,67,0.35);
-      box-shadow: 0 8px 28px rgba(48,207,67,0.08);
+      border-color: rgba(52,211,153,0.35);
+      box-shadow: 0 8px 28px rgba(52,211,153,0.08);
     }
 
     .card.ghost-card .tag {
-      background: rgba(48,207,67,0.08);
-      color: #22a832;
-      border-color: rgba(48,207,67,0.25);
+      background: var(--emerald-soft);
+      color: #a7f3d0;
+      border-color: rgba(52,211,153,0.25);
     }
 
-    /* Manufacturing card variant — warm orange accent */
+    /* Manufacturing card variant — cyan/amber accent */
     .card.mfg-card::before {
-      background: linear-gradient(90deg, #c65d21, #a04a18);
+      background: linear-gradient(90deg, var(--cyan), var(--amber));
     }
 
     .card.mfg-card:hover {
-      border-color: rgba(198,93,33,0.35);
-      box-shadow: 0 8px 28px rgba(198,93,33,0.08);
+      border-color: rgba(34,211,238,0.32);
+      box-shadow: 0 8px 28px rgba(34,211,238,0.08);
     }
 
     .footer {
       text-align: center;
       padding: 2rem 1rem;
-      color: #4a6080;
+      color: var(--faint);
       font-size: .8rem;
       border-top: 1px solid rgba(255,255,255,0.05);
       margin-top: auto;
     }
 
-    .footer a { color: #6366f1; text-decoration: none; }
+    .footer a { color: #a7f3d0; text-decoration: none; }
 
     /* ── App viewer ────────────────────────────────────────── */
     #app-frame {
@@ -382,7 +399,7 @@
       display: block;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.07);
-      box-shadow: 0 0 40px rgba(165,180,252,0.06), 0 0 0 1px rgba(99,102,241,0.06);
+      box-shadow: 0 0 40px rgba(52,211,153,0.06), 0 0 0 1px rgba(52,211,153,0.06);
       max-width: 100%;
     }
 
@@ -399,11 +416,11 @@
 
 <!-- ── Navigation ─────────────────────────────────────────── -->
 <nav class="nav">
-  <span class="nav-logo">⚗️ Roman's Lab</span>
-  <button class="nav-tab active" id="nav-home">🏠 Home</button>
+  <span class="nav-logo">Roman's Lab</span>
+  <button class="nav-tab active" id="nav-home">Home</button>
   <span class="nav-divider" id="nav-sep" style="display:none"></span>
   <button class="nav-tab nav-app-tab" id="nav-app-tab" style="display:none"></button>
-  <a href="https://romanmartins.com" target="_blank" rel="noopener noreferrer" style="margin-left:auto;padding:.32rem .85rem;border-radius:7px;border:1px solid rgba(255,255,255,0.08);color:#6b7a94;font-size:.78rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .18s,border-color .18s,background .18s;font-family:inherit" onmouseover="this.style.color='#6366f1';this.style.borderColor='rgba(99,102,241,0.3)';this.style.background='rgba(99,102,241,0.08)'" onmouseout="this.style.color='#6b7a94';this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='none'">romanmartins.com ↗</a>
+  <a href="https://romanmartins.com" target="_blank" rel="noopener noreferrer" style="margin-left:auto;padding:.32rem .85rem;border-radius:7px;border:1px solid rgba(255,255,255,0.08);color:rgba(245,255,249,0.56);font-size:.78rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:color .18s,border-color .18s,background .18s;font-family:inherit" onmouseover="this.style.color='#a7f3d0';this.style.borderColor='rgba(52,211,153,0.34)';this.style.background='rgba(52,211,153,0.1)'" onmouseout="this.style.color='rgba(245,255,249,0.56)';this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='none'">romanmartins.com ↗</a>
 </nav>
 
 <!-- ── Content ────────────────────────────────────────────── -->
@@ -417,9 +434,9 @@
           <img src="roman-martins.jpg" alt="Roman Martins" class="hero-avatar">
         </div>
         <div class="hero-text">
-          <span class="badge">Product Manager &middot; Builder</span>
+          <span class="badge">AI Workflow Systems</span>
           <h1>Roman's <span>Lab</span></h1>
-          <p>AI tools, experiments & builds.</p>
+          <p>Shipped tools, probes, and experiments for messy professional workflows.</p>
         </div>
       </div>
     </div>
@@ -427,37 +444,37 @@
     <div class="grid">
 
       <!-- Manufacturing + AI -->
-      <div class="suite-header" style="--suite-color: #c65d21;">
-        <span class="suite-header-label" style="color: #c65d21;">Manufacturing + AI</span>
-        <span class="suite-header-count" style="color: rgba(198,93,33,0.7); background: rgba(198,93,33,0.08); border-color: rgba(198,93,33,0.2);">4 tools</span>
+      <div class="suite-header">
+        <span class="suite-header-label" style="color: #67e8f9;">Manufacturing + AI</span>
+        <span class="suite-header-count" style="color: rgba(103,232,249,0.72); background: rgba(34,211,238,0.08); border-color: rgba(34,211,238,0.22);">4 tools</span>
       </div>
 
       <div class="card mfg-card" onclick="openApp('https://compliance-navigator-pearl.vercel.app', '🛡 Compliance Navigator')">
         <div class="icon">🛡</div>
         <h2>Compliance Navigator</h2>
         <p>Describe your hardware product, get the EU directives that apply, a compliance checklist with cost estimates, and risk intel from 9,742 real product recalls.</p>
-        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">Forkable Factory · Open Data</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">Forkable Factory · Open Data</span>
       </div>
 
       <div class="card mfg-card" onclick="openApp('https://partcost.vercel.app', '$ Part-Cost Estimator')">
         <div class="icon">$</div>
         <h2>Part-Cost Estimator</h2>
         <p>Upload a 2D drawing or enter specs. Get a detailed part-cost model with cost breakdown, quantity curves, DFM cost drivers, and quote red flags — powered by Claude vision.</p>
-        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ New · Drawing Upload</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">New · Drawing Upload</span>
       </div>
 
       <div class="card mfg-card" onclick="openApp('apps/toolkit.html', '🛠️ PD Toolkit')">
         <div class="icon">🛠️</div>
         <h2>PD Toolkit</h2>
         <p>Interactive decision tools for product development — Stage-Gate Checker, FMEA Calculator, Make vs Buy Matrix, Cycle Time Estimator.</p>
-        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">Tools</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">Tools</span>
       </div>
 
       <div class="card mfg-card" onclick="openApp('https://uptime-calculator-lime.vercel.app', 'Downtime Cost Calculator')">
         <div class="icon">⏱</div>
         <h2>Downtime Cost Calculator</h2>
         <p>Input your revenue and incident data — see cost-per-minute of downtime, annual risk exposure, and monitoring ROI breakdown with AI executive insight.</p>
-        <span class="tag" style="background:rgba(198,93,33,0.08);color:#c65d21;border-color:rgba(198,93,33,0.2);">✦ New · Live AI Tool</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">New · Live AI Tool</span>
       </div>
 
       <!-- AI PM Toolkit -->
@@ -756,7 +773,7 @@ function drawSnake() {
   snake.forEach((seg, i) => {
     let t = 1 - i / snake.length;
     ctx.fillStyle = `rgba(${Math.round(20*t)}, ${Math.round(180+75*t)}, ${Math.round(90*t)}, ${0.45+0.55*t})`;
-    if (i === 0) glow('#a5b4fc', 16); else noGlow();
+    if (i === 0) glow('#34d399', 16); else noGlow();
     let pad = i === 0 ? 1 : 3;
     ctx.fillRect(seg.x*CELL+pad, seg.y*CELL+pad, CELL-pad*2, CELL-pad*2);
   });
@@ -781,8 +798,8 @@ function drawFood() {
   } else {
     let pulse = 0.8 + Math.sin(t * 3) * 0.15;
     let r = CELL/2 * 0.62 * pulse;
-    glow('#6366f1', 18);
-    ctx.fillStyle = '#818cf8';
+    glow('#34d399', 18);
+    ctx.fillStyle = '#34d399';
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
     noGlow();
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
@@ -804,8 +821,8 @@ function drawParticles() {
 function drawHUD() {
   ctx.textBaseline = 'top';
   ctx.font = '12px "Courier New"';
-  glow('#a5b4fc', 6);
-  ctx.fillStyle = '#a5b4fc';
+  glow('#34d399', 6);
+  ctx.fillStyle = '#a7f3d0';
   ctx.textAlign = 'left';
   ctx.fillText('SCORE ' + score, 8, 8);
   noGlow();
@@ -826,13 +843,13 @@ function drawFlash() {
 }
 
 function drawTitle() {
-  ctx.fillStyle = '#080810';
+  ctx.fillStyle = '#07110d';
   ctx.fillRect(0, 0, COLS*CELL, ROWS*CELL);
   drawGrid();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  glow('#a5b4fc', 30);
+  glow('#34d399', 30);
   ctx.font = 'bold 48px "Courier New"';
-  ctx.fillStyle = '#a5b4fc';
+  ctx.fillStyle = '#a7f3d0';
   ctx.fillText('SNAKE', COLS*CELL/2, ROWS*CELL/2 - 50);
   noGlow();
   ctx.font = '12px "Courier New"';
@@ -872,7 +889,7 @@ function drawDead() {
 
 function draw() {
   if (state === 'title') { drawTitle(); return; }
-  ctx.fillStyle = '#080810';
+  ctx.fillStyle = '#07110d';
   ctx.fillRect(0, 0, COLS*CELL, ROWS*CELL);
   drawGrid();
   drawParticles();
@@ -919,4 +936,3 @@ requestAnimationFrame(loop);
 
 </body>
 </html>
-

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    background:
+      radial-gradient(circle at 82% 12%, rgba(52,211,153,0.18), transparent 38%),
+      radial-gradient(circle at 8% 95%, rgba(34,211,238,0.1), transparent 40%),
+      linear-gradient(135deg, #07110d 0%, #091712 45%, #0b2118 100%);
+    color: #f5fff9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 90px;
+    position: relative;
+  }
+  .topline {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid rgba(52,211,153,0.35);
+    background: rgba(52,211,153,0.1);
+    color: #a7f3d0;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 40px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #34d399; box-shadow: 0 0 14px rgba(52,211,153,0.9); }
+  h1 { font-size: 110px; font-weight: 800; line-height: 1.04; letter-spacing: -0.02em; }
+  h1 span { color: #34d399; }
+  .sub {
+    margin-top: 26px;
+    font-size: 34px;
+    line-height: 1.4;
+    color: rgba(245,255,249,0.72);
+    max-width: 950px;
+  }
+  .sub b { color: #f5fff9; font-weight: 700; }
+  .bottom {
+    position: absolute;
+    left: 90px; right: 90px; bottom: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 26px;
+    color: rgba(245,255,249,0.55);
+    font-weight: 600;
+  }
+  .bottom .site { color: #a7f3d0; }
+  .bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 10px;
+    background: linear-gradient(90deg, #34d399, #22d3ee, #f5c76b);
+  }
+</style>
+</head>
+<body>
+  <div class="bar"></div>
+  <div class="topline">
+    <span class="chip"><span class="dot"></span>Roman Martins · AI Product Manager</span>
+  </div>
+  <h1>Roman's <span>Lab</span></h1>
+  <div class="sub"><b>25+ live AI tools, probes &amp; leaderboards</b> – agentic AI for manufacturing, AI PM tooling, weekly published research. Shipped solo.</div>
+  <div class="bottom">
+    <span>Built with Claude Code</span>
+    <span class="site">romanmartins.com</span>
+  </div>
+</body>
+</html>

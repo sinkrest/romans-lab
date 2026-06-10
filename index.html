@@ -3,7 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roman's Lab</title>
+  <title>Roman's Lab — 25+ live AI tools by Roman Martins</title>
+  <meta name="description" content="25+ shipped AI tools, probes, and leaderboards – agentic AI for manufacturing, AI PM tooling, and weekly published research. Built solo by Roman Martins, AI Product Manager.">
+  <link rel="canonical" href="https://sinkrest.github.io/romans-lab/">
+  <meta name="theme-color" content="#07110d">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sinkrest.github.io/romans-lab/">
+  <meta property="og:title" content="Roman's Lab — 25+ live AI tools">
+  <meta property="og:description" content="Shipped AI tools, probes, and leaderboards – agentic AI for manufacturing, AI PM tooling, weekly published research. Built solo by Roman Martins.">
+  <meta property="og:image" content="https://sinkrest.github.io/romans-lab/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Roman's Lab — 25+ live AI tools">
+  <meta name="twitter:description" content="Shipped AI tools, probes, and leaderboards – built solo by Roman Martins, AI Product Manager.">
+  <meta name="twitter:image" content="https://sinkrest.github.io/romans-lab/og-card.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Roman Martins",
+    "jobTitle": "AI Product Manager",
+    "email": "mailto:roman@romanmartins.com",
+    "url": "https://romanmartins.com",
+    "sameAs": [
+      "https://www.linkedin.com/in/romanmartins",
+      "https://sinkrest.github.io/romans-lab/",
+      "https://github.com/forkable-factory"
+    ]
+  }
+  </script>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -221,12 +250,14 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 1.2rem;
+      width: 100%;
       max-width: 860px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem;
     }
 
     .card {
+      display: block;
       background: rgba(11,21,17,0.9);
       border: 1px solid var(--line);
       backdrop-filter: blur(8px);
@@ -361,6 +392,159 @@
       box-shadow: 0 8px 28px rgba(34,211,238,0.08);
     }
 
+    /* Forkable Factory card variant — amber accent */
+    .card.ff-card::before {
+      background: linear-gradient(90deg, var(--amber), var(--emerald));
+    }
+
+    .card.ff-card:hover {
+      border-color: rgba(245,199,107,0.4);
+      box-shadow: 0 8px 28px rgba(245,199,107,0.09);
+    }
+
+    .card.ff-card .tag {
+      background: rgba(245,199,107,0.1);
+      color: #fbe3ae;
+      border-color: rgba(245,199,107,0.26);
+    }
+
+    .suite-note {
+      grid-column: 1 / -1;
+      font-size: .78rem;
+      color: var(--muted);
+      margin: -.2rem 0 .2rem;
+      line-height: 1.4;
+    }
+
+    .suite-note a { color: #fbe3ae; text-decoration: none; border-bottom: 1px solid rgba(245,199,107,0.3); }
+    .suite-note a:hover { color: #f5c76b; }
+
+    /* ── Hero CTAs ─────────────────────────────────────────── */
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .55rem;
+      margin-top: .85rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 700;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s, background .18s, border-color .18s, color .18s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      color: #052e1d;
+      border: 1px solid rgba(52,211,153,0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(52,211,153,0.25);
+    }
+
+    .btn-ghost {
+      background: rgba(52,211,153,0.06);
+      color: #a7f3d0;
+      border: 1px solid rgba(52,211,153,0.3);
+    }
+
+    .btn-ghost:hover {
+      background: var(--emerald-soft);
+      border-color: rgba(52,211,153,0.5);
+    }
+
+    .avail {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      font-size: .76rem;
+      font-weight: 600;
+      color: #a7f3d0;
+      padding: .4rem .8rem;
+      border-radius: 20px;
+      border: 1px solid rgba(52,211,153,0.25);
+      background: rgba(52,211,153,0.07);
+      white-space: nowrap;
+    }
+
+    .avail::before {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px rgba(52,211,153,0.9);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .35; }
+    }
+
+    /* ── Hiring CTA block ──────────────────────────────────── */
+    .cta-block {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 2.5rem;
+    }
+
+    .cta-block-inner {
+      border: 1px solid rgba(52,211,153,0.22);
+      background:
+        radial-gradient(circle at 85% 15%, rgba(52,211,153,0.1), transparent 45%),
+        rgba(11,21,17,0.9);
+      border-radius: 10px;
+      padding: 1.8rem 1.8rem 1.7rem;
+      text-align: center;
+    }
+
+    .cta-block h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: .5rem;
+    }
+
+    .cta-block h3 span { color: var(--emerald); }
+
+    .cta-block p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.55;
+      max-width: 560px;
+      margin: 0 auto .95rem;
+    }
+
+    .cta-block .hero-cta {
+      justify-content: center;
+      margin-top: 0;
+    }
+
+    /* ── Mobile ────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav { overflow-x: auto; scrollbar-width: none; }
+      .nav::-webkit-scrollbar { display: none; }
+      .hero { padding: 1.6rem 1.2rem 1.5rem; }
+      .hero-inner { flex-direction: column; text-align: center; gap: 1rem; }
+      .hero-cta { justify-content: center; }
+      .grid { padding: 1.8rem 1rem; gap: 1rem; }
+      .cta-block { padding: 0 1rem 2rem; }
+      .suite-header-label, .suite-divider-label { white-space: normal; line-height: 1.5; }
+      .btn { white-space: normal; text-align: center; }
+    }
+
     .footer {
       text-align: center;
       padding: 2rem 1rem;
@@ -431,17 +615,66 @@
     <div class="hero">
       <div class="hero-inner">
         <div class="hero-avatar-wrap">
-          <img src="roman-martins.jpg" alt="Roman Martins" class="hero-avatar">
+          <img src="roman-martins-sm.jpg" alt="Roman Martins" class="hero-avatar">
         </div>
         <div class="hero-text">
-          <span class="badge">AI Workflow Systems</span>
+          <span class="badge">Roman Martins · AI Product Manager</span>
           <h1>Roman's <span>Lab</span></h1>
-          <p>Shipped tools, probes, and experiments for messy professional workflows.</p>
+          <p>25+ live AI tools, probes, and leaderboards – designed, built, and shipped solo.<br>Most PMs write decks about AI. This is what shipping it looks like.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="mailto:roman@romanmartins.com">✉ roman@romanmartins.com</a>
+            <a class="btn btn-ghost" href="https://www.linkedin.com/in/romanmartins" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+            <span class="avail">Open to senior AI product roles</span>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="grid">
+
+      <!-- Forkable Factory — flagship research -->
+      <div class="suite-header" id="forkable-factory">
+        <span class="suite-header-label" style="color: #f5c76b;">Forkable Factory · Agentic AI × Manufacturing</span>
+        <span class="suite-header-count" style="color: rgba(245,199,107,0.78); background: rgba(245,199,107,0.08); border-color: rgba(245,199,107,0.22);">Flagship</span>
+      </div>
+      <div class="suite-note">
+        Weekly published research: how far can AI agents take a product from prompt to physical part? Also a newsletter – <a href="https://romanmartins.com/subscribe" target="_blank" rel="noopener noreferrer">subscribe ↗</a>
+      </div>
+
+      <a class="card ff-card" href="https://romanmartins.com/manufacturing-apis" target="_blank" rel="noopener noreferrer">
+        <div class="icon">🏭</div>
+        <h2>State of Manufacturing APIs</h2>
+        <p>Can an agent get a part quoted and ordered without a human? Weekly leaderboard scoring Xometry, Protolabs, Hubs + 4 more on 8 agent-readiness dimensions. Open methodology, RSS changelog.</p>
+        <span class="tag">Weekly probe · Leaderboard ↗</span>
+      </a>
+
+      <a class="card ff-card" href="https://romanmartins.com/cad-agents" target="_blank" rel="noopener noreferrer">
+        <div class="icon">📐</div>
+        <h2>State of Agent CAD</h2>
+        <p>Which AI CAD tools can an agent actually drive? 8 vendors – Adam, Zoo.dev, Onshape + more – scored weekly on agent-readiness. A reference board for the agent-CAD space.</p>
+        <span class="tag">Weekly probe ↗</span>
+      </a>
+
+      <a class="card ff-card" href="https://romanmartins.com/agent-buildable-index" target="_blank" rel="noopener noreferrer">
+        <div class="icon">🔬</div>
+        <h2>Agent-Buildable Index</h2>
+        <p>How much of a real hardware product can agents build today? 5 products scored end-to-end across 7 dimensions – spec, CAD, PCB, BOM, manufacturing handoff, firmware, compliance. Every point requires evidence.</p>
+        <span class="tag">Flagship research ↗</span>
+      </a>
+
+      <a class="card ff-card" href="https://romanmartins.com/forkable-factory/photo-to-print" target="_blank" rel="noopener noreferrer">
+        <div class="icon">📸</div>
+        <h2>Photo-to-Print</h2>
+        <p>Drop a photo, get a printable STL with a printability score in ~40 seconds. Runs 3 open-source image-to-3D models side by side and scores the meshes.</p>
+        <span class="tag">Live tool ↗</span>
+      </a>
+
+      <a class="card ff-card" href="https://romanmartins.com/forkable-factory/map" target="_blank" rel="noopener noreferrer">
+        <div class="icon">🗺</div>
+        <h2>Factory Map</h2>
+        <p>All 10 phases of physical product creation, mapped and scored for how far an agent-run fork reaches today. Statuses auto-derive from live probe data.</p>
+        <span class="tag">Research map ↗</span>
+      </a>
 
       <!-- Manufacturing + AI -->
       <div class="suite-header">
@@ -460,7 +693,7 @@
         <div class="icon">$</div>
         <h2>Part-Cost Estimator</h2>
         <p>Upload a 2D drawing or enter specs. Get a detailed part-cost model with cost breakdown, quantity curves, DFM cost drivers, and quote red flags — powered by Claude vision.</p>
-        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">New · Drawing Upload</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">Claude Vision · Drawing Upload</span>
       </div>
 
       <div class="card mfg-card" onclick="openApp('apps/toolkit.html', '🛠️ PD Toolkit')">
@@ -474,7 +707,7 @@
         <div class="icon">⏱</div>
         <h2>Downtime Cost Calculator</h2>
         <p>Input your revenue and incident data — see cost-per-minute of downtime, annual risk exposure, and monitoring ROI breakdown with AI executive insight.</p>
-        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">New · Live AI Tool</span>
+        <span class="tag" style="background:rgba(34,211,238,0.08);color:#67e8f9;border-color:rgba(34,211,238,0.22);">Live AI Tool</span>
       </div>
 
       <!-- AI PM Toolkit -->
@@ -486,7 +719,7 @@
         <div class="icon">💬</div>
         <h2>Ask My Portfolio</h2>
         <p>Ask Jarvi anything about Roman's work – skills, projects, case studies – and get cited answers from a curated knowledge base. Powered by Claude.</p>
-        <span class="tag">✦ New · RAG · Live AI</span>
+        <span class="tag">✦ RAG · Live AI</span>
       </div>
 
       <div class="card" onclick="openApp('https://romanmartins.com/feed', 'The Wire — AI Code Intelligence')">
@@ -494,6 +727,27 @@
         <h2>The Wire</h2>
         <p>Where are the product opportunities in AI coding tools? Screens Claude Code and OpenClaw daily — surfacing gaps, pain points, and emerging patterns a PM would act on.</p>
         <span class="tag">✦ Live · Product Opportunity Radar</span>
+      </div>
+
+      <div class="card" onclick="openApp('https://flow-doctor-kestra.vercel.app', '🩺 Flow Doctor')">
+        <div class="icon">🩺</div>
+        <h2>Flow Doctor</h2>
+        <p>Paste a Kestra flow's YAML, get a 0–100 reliability scorecard with cited one-line fixes – failure handling, observability, scale risk, guardrails. 100% client-side.</p>
+        <span class="tag">✦ New · Live Tool</span>
+      </div>
+
+      <div class="card" onclick="openApp('https://ai-scoping-tool.vercel.app', '◳ AI Scoping Tool')">
+        <div class="icon">◳</div>
+        <h2>AI Scoping Tool</h2>
+        <p>Describe a business problem. Short discovery questions turn it into a structured AI scoping document you can act on – approach, effort, and risks.</p>
+        <span class="tag">✦ Live AI Tool</span>
+      </div>
+
+      <div class="card" onclick="openApp('https://ai-discovery-simulator.vercel.app', '⧉ AI Discovery Simulator')">
+        <div class="icon">⧉</div>
+        <h2>AI Discovery Simulator</h2>
+        <p>Validate a product idea in four phases – synthetic personas, simulated discovery interviews, and a synthesized Opportunity Brief at the end.</p>
+        <span class="tag">✦ Live AI Tool</span>
       </div>
 
       <div class="card" onclick="openApp('https://ai-pm-archetype.vercel.app', 'AI PM Archetype Test')">
@@ -514,14 +768,14 @@
         <div class="icon">🌳</div>
         <h2>Discovery Tree Experiment</h2>
         <p>Interactive Opportunity Solution Tree — Teresa Torres framework. Map outcomes to opportunities, solutions, and experiments. Score, prioritize, and generate an AI discovery brief.</p>
-        <span class="tag">✦ New · Live AI Tool</span>
+        <span class="tag">✦ Live AI Tool</span>
       </div>
 
       <div class="card" onclick="openApp('apps/opportunity-scanner.html', '◈ AI Opportunity Scanner')">
         <div class="icon">◈</div>
         <h2>AI Opportunity Scanner</h2>
         <p>Describe your company. Get a ranked map of AI opportunities — Quick Wins vs Strategic Bets, with effort, impact, time to value, and tool recommendations.</p>
-        <span class="tag">✦ New · Live AI Tool</span>
+        <span class="tag">✦ Live AI Tool</span>
       </div>
 
       <!-- Publishing Suite -->
@@ -584,14 +838,14 @@
         <div class="icon">🌌</div>
         <h2>Orbit</h2>
         <p>Gravitational sandbox. Slingshot planets around a star — watch them orbit, merge, and paint trails across space. Real physics. Pure beauty.</p>
-        <span class="tag">✦ New · Physics Sandbox</span>
+        <span class="tag">Physics Sandbox</span>
       </div>
 
       <div class="card" onclick="openApp('flappy.html', '🐤 Ship It Bird')">
         <div class="icon">🐤</div>
         <h2>Ship It Bird</h2>
         <p>Navigate the deployment pipeline. Dodge the pipes. Ship features. Combo streaks, milestone messages, and a high score that persists. The PM's Flappy Bird.</p>
-        <span class="tag">✦ New · Game</span>
+        <span class="tag">Game</span>
       </div>
 
       <div class="card" onclick="openApp('snake.html', '🐍 Snake \'99')">
@@ -610,8 +864,20 @@
 
     </div>
 
+    <div class="cta-block">
+      <div class="cta-block-inner">
+        <h3>Hiring for <span>AI product</span> work?</h3>
+        <p>Everything on this page was shipped solo – spec to deploy. I'm open to senior AI product roles in agentic AI, devtools, and manufacturing.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="mailto:roman@romanmartins.com">✉ roman@romanmartins.com</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/romanmartins" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+          <button class="btn btn-ghost" onclick="openApp('https://ask-portfolio-liard.vercel.app', '💬 Ask My Portfolio — Jarvi')">💬 Ask Jarvi about my work</button>
+        </div>
+      </div>
+    </div>
+
     <footer class="footer">
-      Built by <a href="https://romanmartins.com" target="_blank">Roman Martins</a> &nbsp;·&nbsp; Built with Claude Code &nbsp;·&nbsp; <a href="https://romanmartins.com" target="_blank">romanmartins.com</a>
+      Built by <a href="https://romanmartins.com" target="_blank">Roman Martins</a> &nbsp;·&nbsp; Built with Claude Code &nbsp;·&nbsp; <a href="mailto:roman@romanmartins.com">roman@romanmartins.com</a> &nbsp;·&nbsp; <a href="https://romanmartins.com" target="_blank">romanmartins.com</a>
     </footer>
   </div>
 

@@ -80,12 +80,38 @@
     }
 
     .nav-logo {
-      font-size: .82rem;
-      font-weight: 800;
-      color: var(--emerald);
-      letter-spacing: .07em;
-      margin-right: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-right: .6rem;
+      text-decoration: none;
       white-space: nowrap;
+    }
+    .nav-logo-mark {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: .5rem;
+      background: linear-gradient(135deg, #34d399, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #07110d;
+      font-size: .78rem;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(52,211,153,0.18);
+      transition: box-shadow .2s;
+    }
+    .nav-logo:hover .nav-logo-mark {
+      box-shadow: 0 4px 18px rgba(52,211,153,0.42);
+    }
+    .nav-logo-text {
+      font-size: .9rem;
+      font-weight: 600;
+      color: rgba(245,255,249,0.82);
+      transition: color .2s;
+    }
+    .nav-logo:hover .nav-logo-text {
+      color: #ffffff;
     }
 
     .nav-tab {
@@ -600,7 +626,10 @@
 
 <!-- ── Navigation ─────────────────────────────────────────── -->
 <nav class="nav">
-  <span class="nav-logo">Roman's Lab</span>
+  <a href="https://romanmartins.com" class="nav-logo" aria-label="Roman Martins — romanmartins.com">
+    <span class="nav-logo-mark">R</span>
+    <span class="nav-logo-text">Roman Martins</span>
+  </a>
   <button class="nav-tab active" id="nav-home">Home</button>
   <span class="nav-divider" id="nav-sep" style="display:none"></span>
   <button class="nav-tab nav-app-tab" id="nav-app-tab" style="display:none"></button>

@@ -68,15 +68,20 @@
 
     /* ── Nav ───────────────────────────────────────────────── */
     .nav {
-      display: flex;
-      align-items: center;
-      gap: .3rem;
-      padding: .6rem 1.2rem;
       background: rgba(7,17,13,0.94);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--line);
       flex-shrink: 0;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: .6rem 1.5rem;
     }
 
     .nav-logo {
@@ -639,14 +644,16 @@
 
 <!-- ── Navigation ─────────────────────────────────────────── -->
 <nav class="nav">
-  <a href="https://romanmartins.com" class="nav-logo" aria-label="Roman Martins — romanmartins.com">
-    <span class="nav-logo-mark">R</span>
-    <span class="nav-logo-text">Roman Martins</span>
-  </a>
-  <button class="nav-tab active" id="nav-home" style="display:none">Home</button>
-  <span class="nav-divider" id="nav-sep" style="display:none"></span>
-  <button class="nav-tab nav-app-tab" id="nav-app-tab" style="display:none"></button>
-  <a href="https://romanmartins.com" class="nav-back">← Back</a>
+  <div class="nav-inner">
+    <a href="https://romanmartins.com" class="nav-logo" aria-label="Roman Martins — romanmartins.com">
+      <span class="nav-logo-mark">R</span>
+      <span class="nav-logo-text">Roman Martins</span>
+    </a>
+    <button class="nav-tab active" id="nav-home" style="display:none">Home</button>
+    <span class="nav-divider" id="nav-sep" style="display:none"></span>
+    <button class="nav-tab nav-app-tab" id="nav-app-tab" style="display:none"></button>
+    <a href="https://romanmartins.com" class="nav-back">← Back</a>
+  </div>
 </nav>
 
 <!-- ── Content ────────────────────────────────────────────── -->

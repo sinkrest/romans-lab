@@ -8,30 +8,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PD Toolkit — Product Development Decision Tools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../codex.css">
+    <script src="../codex-boot.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* Local names kept (every call site below still works) but they are now
+           pure ALIASES of codex.css. Never give one its own literal value.
+           TEXT uses a *-text token; bars/fills use the bare fill token. */
         :root {
-          --bg: #080810;
-          --surface: rgba(255,255,255,0.04);
-          --surface2: rgba(255,255,255,0.06);
-          --surface3: rgba(255,255,255,0.08);
-          --border: rgba(255,255,255,0.08);
-          --border-mid: rgba(255,255,255,0.12);
-          --text: #e4eaf4;
-          --text-mid: #94a7c8;
-          --text-dim: #6b7a94;
-          --accent: #c65d21;
-          --accent-light: #e8743a;
-          --accent-bg: rgba(198,93,33,0.08);
-          --accent-border: rgba(198,93,33,0.25);
-          --green: #22c55e;
-          --green-dim: rgba(34,197,94,0.10);
-          --amber: #f59e0b;
-          --amber-dim: rgba(245,158,11,0.10);
-          --red: #ef4444;
-          --red-dim: rgba(239,68,68,0.08);
+          --bg: var(--cx-paper-deep);
+          --surface: var(--cx-card);
+          --surface2: var(--cx-raise);
+          --surface3: var(--cx-well);
+          --border: var(--cx-ink-faint);
+          --border-mid: var(--cx-rule-strong);
+          --text: var(--cx-ink);
+          --text-mid: var(--cx-ink-soft);
+          --text-dim: var(--cx-ink-faint-text);
+          --accent: var(--cx-orange);            /* the brand accent is orange now */
+          --accent-light: var(--cx-orange-deep); /* orange TEXT under 24px         */
+          --accent-bg: rgba(242,106,33,0.10);    /* its wash                       */
+          --accent-border: rgba(242,106,33,0.30);
+          --green: var(--cx-accent-text);        /* semantic "good" — TEXT         */
+          --green-fill: var(--cx-accent);        /* semantic "good" — BAR/FILL     */
+          --green-dim: var(--cx-accent-wash);
+          --amber: var(--cx-hype-text);
+          --amber-fill: var(--cx-hype);
+          --amber-dim: var(--cx-hype-wash);
+          --red: var(--cx-danger-text);
+          --red-fill: var(--cx-danger);
+          --red-dim: var(--cx-danger-wash);
           --radius: 16px;
           --radius-sm: 10px;
         }
@@ -49,7 +57,7 @@
         /* Nav */
         .nav {
           position: sticky; top: 0; z-index: 100;
-          background: rgba(8,8,16,0.82); backdrop-filter: blur(16px);
+          background: var(--cx-header-bg); backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-bottom: 1px solid var(--border);
         }
@@ -65,7 +73,7 @@
         }
         .nav-logo-icon {
           width: 30px; height: 30px; border-radius: 8px;
-          background: var(--accent); color: #fff;
+          background: var(--accent); color: var(--cx-on-orange);
           display: flex; align-items: center; justify-content: center;
           font-size: 14px;
         }
@@ -89,7 +97,10 @@
           text-align: center;
           padding: 56px 20px 48px;
           margin: 0 -20px 32px;
-          background: linear-gradient(135deg, #080810 0%, #0f0f1a 40%, #1a1020 70%, #2d1a10 100%);
+          background:
+            linear-gradient(115deg, rgba(242,106,33,0.08), transparent 34%, rgba(43,127,190,0.05) 78%, transparent),
+            radial-gradient(circle at 74% 18%, rgba(242,106,33,0.12), transparent 32%),
+            linear-gradient(135deg, var(--cx-glow) 0%, var(--cx-paper) 45%, var(--cx-paper-deep) 100%);
           border-bottom: 1px solid var(--border);
         }
         .hero-badge {
@@ -146,19 +157,20 @@
           color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px;
           margin-bottom: 10px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        select option { background: #12121e; color: var(--text); }
+        select option { background: var(--cx-paper); color: var(--text); }
         textarea { resize: vertical; min-height: 60px; }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px rgba(198,93,33,0.15); }
+        input:focus, select:focus, textarea:focus { border-color: var(--cx-orange-deep); box-shadow: 0 0 0 3px rgba(242,106,33,0.20); }
         input::placeholder, textarea::placeholder { color: var(--text-dim); }
 
         /* Buttons */
         .btn {
-          background: var(--accent); color: #fff; border: none;
+          background: var(--cx-orange);
+          color: var(--cx-on-orange); border: 1px solid rgba(242,106,33,0.5);
           padding: 10px 20px; border-radius: var(--radius-sm);
           font-size: 13px; font-weight: 600; cursor: pointer;
           font-family: 'Inter', sans-serif; transition: all 0.2s; letter-spacing: 0.02em;
         }
-        .btn:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(198,93,33,0.3); }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(242,106,33,0.25); }
         .btn-sm { padding: 7px 14px; font-size: 12px; }
 
         /* Results */
@@ -174,6 +186,15 @@
         .gauge { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
         .gauge-bar { flex: 1; height: 10px; background: var(--surface3); border-radius: 5px; overflow: hidden; }
         .gauge-fill { height: 100%; border-radius: 5px; transition: width .6s ease; }
+        /* Bars are graphics -> bare fill tokens. Verdict lines are text -> *-text.
+           Kept as classes (not inline styles) so canvas-free JS never has to
+           hand a var() to the CSSOM and the fills re-resolve on theme change. */
+        .fill-good { background: var(--green-fill); }
+        .fill-warn { background: var(--amber-fill); }
+        .fill-bad  { background: var(--red-fill); }
+        .v-good { color: var(--green); }
+        .v-warn { color: var(--amber); }
+        .v-bad  { color: var(--red); }
         .gauge-label { font-size: 18px; font-weight: 800; min-width: 55px; text-align: right; color: var(--text); font-family: 'JetBrains Mono', monospace; }
 
         /* Grid */
@@ -208,7 +229,17 @@
 
         /* Cycle time */
         .timeline { display: flex; gap: 2px; margin: 14px 0; border-radius: var(--radius-sm); overflow: hidden; height: 36px; }
-        .timeline-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; min-width: 30px; transition: flex .4s; }
+        /* A stacked gantt has no wash equivalent — the fills ARE the chart. Ink
+           label on the fill (the codex's --cx-on-orange idiom), never white. */
+        .timeline-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--cx-on-orange); min-width: 30px; transition: flex .4s; }
+        .seg-0 { background: var(--cx-info); }
+        .seg-1 { background: var(--cx-brandalt); }
+        .seg-2 { background: var(--cx-orange); }
+        .seg-3 { background: var(--cx-accent); }
+        .seg-4 { background: var(--cx-hype); }
+        .seg-5 { background: var(--cx-orange); }
+        .seg-6 { background: var(--cx-danger); }
+        .seg-7 { background: var(--cx-info); }
 
         .footer {
           text-align: center; padding: 24px 16px; color: var(--text-dim);
@@ -219,7 +250,7 @@
 
         /* Remove btn */
         .remove-btn { cursor: pointer; color: var(--red); font-size: 14px; }
-        .remove-btn:hover { color: #f87171; }
+        .remove-btn:hover { color: var(--red-fill); }
     </style>
 </head>
 <body>
@@ -264,7 +295,7 @@
         <div class="result-box show" id="gateResult">
             <h3>Gate Readiness</h3>
             <div class="gauge">
-                <div class="gauge-bar"><div class="gauge-fill" id="gateFill" style="width:0%;background:var(--red)"></div></div>
+                <div class="gauge-bar"><div class="gauge-fill fill-bad" id="gateFill" style="width:0%"></div></div>
                 <div class="gauge-label" id="gateScore">0%</div>
             </div>
             <p id="gateVerdict" style="margin-top:8px;font-size:13px;color:var(--text-mid);"></p>
@@ -305,7 +336,7 @@
             <h3>Recommendation</h3>
             <div class="gauge">
                 <div style="font-size:12px;color:var(--red);font-weight:600;">BUY</div>
-                <div class="gauge-bar"><div class="gauge-fill" id="mbFill" style="width:50%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green))"></div></div>
+                <div class="gauge-bar"><div class="gauge-fill" id="mbFill" style="width:50%;background:linear-gradient(90deg,var(--red-fill),var(--amber-fill),var(--green-fill))"></div></div>
                 <div style="font-size:12px;color:var(--green);font-weight:600;">MAKE</div>
             </div>
             <p id="mbVerdict" style="margin-top:10px;font-size:14px;font-weight:600;text-align:center;"></p>
@@ -360,7 +391,7 @@ function renderGate() {
     items.forEach((item, i) => {
         html += `<div class="gate-row">
             <input type="checkbox" class="gate-check" id="gc${i}" onchange="calcGate()">
-            <label class="gate-label" for="gc${i}" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:400;color:var(--text)">${item}</label>
+            <label class="gate-label" for="gc${i}" style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:400">${item}</label>
             <span class="gate-status fail" id="gs${i}">Pending</span>
         </div>`;
     });
@@ -379,7 +410,7 @@ function calcGate() {
     const pct = total ? Math.round(done / total * 100) : 0;
     const fill = document.getElementById('gateFill');
     fill.style.width = pct + '%';
-    fill.style.background = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+    fill.className = 'gauge-fill ' + (pct >= 80 ? 'fill-good' : pct >= 50 ? 'fill-warn' : 'fill-bad');
     document.getElementById('gateScore').textContent = pct + '%';
     const v = document.getElementById('gateVerdict');
     if (pct === 100) v.textContent = 'All criteria met — ready to pass this gate.';
@@ -459,22 +490,24 @@ function calcMB() {
     document.getElementById('mbFill').style.width = pct + '%';
     const v = document.getElementById('mbVerdict');
     const d = document.getElementById('mbDetail');
-    if (pct >= 70) { v.textContent = 'MAKE — Strong case for in-house manufacturing'; v.style.color = 'var(--green)'; d.textContent = `Score: ${pct}% — Multiple factors favor keeping this in-house.`; }
-    else if (pct >= 45) { v.textContent = 'HYBRID — Consider partial outsourcing'; v.style.color = 'var(--amber)'; d.textContent = `Score: ${pct}% — Mixed signals. Explore co-manufacturing or phased approach.`; }
-    else { v.textContent = 'BUY — Outsourcing is likely optimal'; v.style.color = 'var(--red)'; d.textContent = `Score: ${pct}% — Few factors support in-house. Focus resources on core competencies.`; }
+    if (pct >= 70) { v.textContent = 'MAKE — Strong case for in-house manufacturing'; v.className = 'v-good'; d.textContent = `Score: ${pct}% — Multiple factors favor keeping this in-house.`; }
+    else if (pct >= 45) { v.textContent = 'HYBRID — Consider partial outsourcing'; v.className = 'v-warn'; d.textContent = `Score: ${pct}% — Mixed signals. Explore co-manufacturing or phased approach.`; }
+    else { v.textContent = 'BUY — Outsourcing is likely optimal'; v.className = 'v-bad'; d.textContent = `Score: ${pct}% — Few factors support in-house. Focus resources on core competencies.`; }
 }
 renderMB();
 
 // ========== CYCLE TIME ==========
+// Segment colours live in CSS (.seg-0 … .seg-7) so they stay codex tokens and
+// re-resolve on a theme flip — the array carries the phase index, not a hex.
 const phases = [
-    { name: 'Concept', color: '#3498db', weeks: 4 },
-    { name: 'Feasibility', color: '#9b59b6', weeks: 6 },
-    { name: 'Design', color: '#c65d21', weeks: 10 },
-    { name: 'Prototyping', color: '#22c55e', weeks: 8 },
-    { name: 'Testing & Validation', color: '#f59e0b', weeks: 12 },
-    { name: 'Tooling & Pre-production', color: '#e8743a', weeks: 10 },
-    { name: 'Production Ramp', color: '#ef4444', weeks: 6 },
-    { name: 'Launch', color: '#0891b2', weeks: 3 },
+    { name: 'Concept', weeks: 4 },
+    { name: 'Feasibility', weeks: 6 },
+    { name: 'Design', weeks: 10 },
+    { name: 'Prototyping', weeks: 8 },
+    { name: 'Testing & Validation', weeks: 12 },
+    { name: 'Tooling & Pre-production', weeks: 10 },
+    { name: 'Production Ramp', weeks: 6 },
+    { name: 'Launch', weeks: 3 },
 ];
 
 function renderCycleInputs() {
@@ -495,9 +528,9 @@ function calcCycle() {
     if (total === 0) return;
 
     let html = '';
-    vals.forEach(v => {
+    vals.forEach((v, i) => {
         if (v.weeks === 0) return;
-        html += `<div class="timeline-seg" style="flex:${v.weeks};background:${v.color}" title="${v.name}: ${v.weeks}w">${v.weeks > 3 ? v.name.split(' ')[0] : ''}</div>`;
+        html += `<div class="timeline-seg seg-${i}" style="flex:${v.weeks}" title="${v.name}: ${v.weeks}w">${v.weeks > 3 ? v.name.split(' ')[0] : ''}</div>`;
     });
     document.getElementById('cycleTimeline').innerHTML = html;
 

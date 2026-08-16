@@ -10,12 +10,14 @@
   <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../codex.css">
+  <script src="../codex-boot.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       height: 100%;
-      background: #07110d;
+      background: var(--cx-paper-deep);
       font-family: 'Inter', -apple-system, sans-serif;
     }
     body {
@@ -29,17 +31,17 @@
       align-items: center;
       gap: .6rem;
       padding: .55rem 1rem;
-      background: rgba(7,17,13,0.94);
+      background: var(--cx-header-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid var(--cx-ink-faint);
       flex-shrink: 0;
     }
     .bar a {
       padding: .3rem .75rem;
       border-radius: 7px;
       border: 1px solid transparent;
-      color: rgba(245,255,249,0.56);
+      color: var(--cx-ink-soft);
       font-size: .78rem;
       font-weight: 600;
       text-decoration: none;
@@ -48,27 +50,27 @@
       transition: color .18s, border-color .18s, background .18s;
     }
     .bar a:hover {
-      color: #34d399;
-      border-color: rgba(52,211,153,0.3);
-      background: rgba(52,211,153,0.08);
+      color: var(--cx-orange-deep);
+      border-color: var(--cx-orange);
+      background: rgba(242,106,33,0.12);
     }
     .bar .crumb {
       font-size: .78rem;
       font-weight: 600;
-      color: #34d399;
+      color: var(--cx-orange-deep);
       letter-spacing: .04em;
     }
     .bar .sep {
       width: 1px;
       height: 14px;
-      background: rgba(255,255,255,0.12);
+      background: rgba(var(--cx-ink-rgb),0.18);
     }
     iframe {
       display: block;
       width: 100%;
       flex: 1;
       border: 0;
-      background: #07110d;
+      background: var(--cx-paper-deep);
     }
   </style>
 </head>

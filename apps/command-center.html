@@ -8,12 +8,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Industrial Command Center — Roman Martins Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../codex.css">
+    <script src="../codex-boot.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #060d1a; color: #e4eaf4; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--cx-paper-deep); color: var(--cx-ink); min-height: 100vh; overflow-x: hidden; }
 
-        .back { position: fixed; top: .8rem; left: .8rem; color: #6366f1; text-decoration: none; font-size: .82rem; z-index: 100; opacity: .7; transition: opacity .2s; }
+        .back { position: fixed; top: .8rem; left: .8rem; color: var(--cx-orange-deep); text-decoration: none; font-size: .82rem; z-index: 100; opacity: .7; transition: opacity .2s; }
         .back:hover { opacity: 1; }
 
         /* Top bar */
@@ -22,20 +24,20 @@
             align-items: center;
             justify-content: space-between;
             padding: .6rem 1.2rem;
-            background: rgba(6,13,26,0.95);
-            border-bottom: 1px solid rgba(99,102,241,0.15);
+            background: var(--cx-header-bg);
+            border-bottom: 1px solid var(--cx-ink-faint);
             backdrop-filter: blur(10px);
             position: sticky;
             top: 0;
             z-index: 50;
         }
-        .topbar .logo { font-weight: 800; font-size: .95rem; color: #fff; }
-        .topbar .logo span { color: #6366f1; }
+        .topbar .logo { font-weight: 800; font-size: .95rem; color: var(--cx-ink); }
+        .topbar .logo span { color: var(--cx-orange-deep); }
         .topbar .status { display: flex; align-items: center; gap: 1.2rem; }
-        .topbar .dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.4); } 50% { box-shadow: 0 0 0 6px rgba(46,204,113,0); } }
-        .topbar .clock { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: #6366f1; }
-        .topbar .sys { font-size: .72rem; color: #5d7da3; }
+        .topbar .dot { width: 8px; height: 8px; background: var(--cx-accent); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cx-accent) 40%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+        .topbar .clock { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--cx-orange-deep); }
+        .topbar .sys { font-size: .72rem; color: var(--cx-ink-faint-text); }
 
         /* Main grid */
         .grid {
@@ -51,8 +53,8 @@
 
         /* Panels */
         .panel {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(99,102,241,0.1);
+            background: var(--cx-card);
+            border: 1px solid var(--cx-ink-faint);
             border-radius: 10px;
             overflow: hidden;
             position: relative;
@@ -62,24 +64,24 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(242,106,33,0.35), transparent);
         }
         .panel-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: .6rem .9rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--cx-divider);
+            background: var(--cx-raise);
         }
         .panel-header h3 {
             font-size: .72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: .08em;
-            color: #5d7da3;
+            color: var(--cx-ink-soft);
         }
-        .panel-header .indicator { font-size: .68rem; color: #2ecc71; font-weight: 600; }
+        .panel-header .indicator { font-size: .68rem; color: var(--cx-accent-text); font-weight: 600; }
         .panel-body { padding: .8rem; }
 
         /* Supply chain canvas */
@@ -89,54 +91,57 @@
         /* KPI Gauges */
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
         .kpi {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: var(--cx-raise);
+            border: 1px solid var(--cx-ink-faint);
             border-radius: 8px;
             padding: .7rem;
             text-align: center;
             position: relative;
         }
-        .kpi .kpi-label { font-size: .65rem; color: #5d7da3; text-transform: uppercase; letter-spacing: .05em; }
+        .kpi .kpi-label { font-size: .65rem; color: var(--cx-ink-faint-text); text-transform: uppercase; letter-spacing: .05em; }
         .kpi .kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 700; margin: .3rem 0 .1rem; }
         .kpi .kpi-delta { font-size: .7rem; font-weight: 600; }
-        .kpi .kpi-delta.up { color: #2ecc71; }
-        .kpi .kpi-delta.down { color: #e74c3c; }
+        .kpi .kpi-delta.up { color: var(--cx-accent-text); }
+        .kpi .kpi-delta.down { color: var(--cx-danger-text); }
 
         /* Mini gauge */
         .gauge-ring { position: relative; width: 56px; height: 56px; margin: .4rem auto; }
         .gauge-ring svg { transform: rotate(-90deg); }
-        .gauge-ring .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'JetBrains Mono', monospace; font-size: .75rem; font-weight: 700; color: #fff; }
+        .gauge-ring .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'JetBrains Mono', monospace; font-size: .75rem; font-weight: 700; color: var(--cx-ink); }
 
         /* Log feed */
         .log-feed {
             font-family: 'JetBrains Mono', monospace;
             font-size: .72rem;
-            color: #5d7da3;
+            color: var(--cx-ink-faint-text);
             max-height: 200px;
             overflow-y: auto;
             line-height: 1.7;
         }
-        .log-feed .log-entry { border-bottom: 1px solid rgba(255,255,255,0.03); padding: .2rem 0; display: flex; gap: .5rem; }
-        .log-feed .log-time { color: #3a506b; min-width: 55px; }
-        .log-feed .log-msg { color: #8a9dba; }
-        .log-feed .log-ok { color: #2ecc71; }
-        .log-feed .log-warn { color: #f39c12; }
-        .log-feed .log-err { color: #e74c3c; }
+        .log-feed .log-entry { border-bottom: 1px solid var(--cx-divider); padding: .2rem 0; display: flex; gap: .5rem; }
+        .log-feed .log-time { color: var(--cx-ink-faint-text); min-width: 55px; }
+        .log-feed .log-msg { color: var(--cx-ink-soft); }
+        .log-feed .log-ok { color: var(--cx-accent-text); }
+        .log-feed .log-warn { color: var(--cx-hype-text); }
+        .log-feed .log-err { color: var(--cx-danger-text); }
 
         /* Timeline */
         .timeline { display: flex; gap: 2px; height: 50px; align-items: flex-end; }
         .tbar { flex: 1; border-radius: 2px 2px 0 0; transition: height .3s; min-width: 3px; }
+        .tbar.bar-good  { background: var(--cx-accent); }
+        .tbar.bar-brand { background: var(--cx-orange); }
+        .tbar.bar-warn  { background: var(--cx-hype); }
 
         /* Scenario panel */
         .scenario-controls { display: flex; flex-direction: column; gap: .6rem; }
         .sc-row { display: flex; align-items: center; gap: .6rem; }
-        .sc-row label { font-size: .78rem; color: #8a9dba; min-width: 90px; }
-        .sc-row input[type="range"] { flex: 1; accent-color: #6366f1; }
-        .sc-row .sc-val { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: #6366f1; min-width: 36px; text-align: right; font-weight: 600; }
+        .sc-row label { font-size: .78rem; color: var(--cx-ink-soft); min-width: 90px; }
+        .sc-row input[type="range"] { flex: 1; accent-color: var(--cx-orange); }
+        .sc-row .sc-val { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--cx-orange-deep); min-width: 36px; text-align: right; font-weight: 600; }
         .sc-btn {
-            background: linear-gradient(90deg, #6366f1, #312e81);
-            color: #fff;
-            border: none;
+            background: var(--cx-orange);
+            color: var(--cx-on-orange);
+            border: 1px solid rgba(242,106,33,0.5);
             padding: .55rem 1.2rem;
             border-radius: 7px;
             font-size: .85rem;
@@ -146,7 +151,18 @@
             transition: transform .15s, box-shadow .2s;
             margin-top: .3rem;
         }
-        .sc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,0.25); }
+        .sc-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(242,106,33,0.25); }
+        .sc-result { margin-top: .6rem; font-size: .82rem; color: var(--cx-ink-soft); line-height: 1.5; }
+        /* Figures are small text -> orange-deep. Verdict tones take *-text;
+           the rule down the left is a graphic, so it takes the bare fill. */
+        .sc-figure { color: var(--cx-orange-deep); font-weight: 700; }
+        .tone-good { color: var(--cx-accent-text); font-weight: 700; }
+        .tone-warn { color: var(--cx-hype-text); font-weight: 700; }
+        .tone-bad  { color: var(--cx-danger-text); font-weight: 700; }
+        .sc-verdict { padding-left: .6rem; border-left: 3px solid var(--cx-ink-faint); }
+        .sc-verdict.rule-good { border-left-color: var(--cx-accent); }
+        .sc-verdict.rule-warn { border-left-color: var(--cx-hype); }
+        .sc-verdict.rule-bad  { border-left-color: var(--cx-danger); }
 
         /* Risk matrix */
         .risk-matrix {
@@ -162,12 +178,12 @@
             justify-content: center;
             font-size: .6rem;
             font-weight: 700;
-            color: rgba(255,255,255,0.7);
+            color: rgba(var(--cx-ink-rgb),0.7);
             transition: transform .2s, filter .2s;
             cursor: pointer;
         }
         .risk-cell:hover { transform: scale(1.15); filter: brightness(1.3); z-index: 2; }
-        .risk-cell.active { outline: 2px solid #fff; outline-offset: 1px; }
+        .risk-cell.active { outline: 2px solid var(--cx-ink); outline-offset: 1px; }
 
         /* World dots */
         .world-strip {
@@ -179,10 +195,12 @@
             text-align: center;
         }
         .world-dot .flag { font-size: 1.2rem; }
-        .world-dot .wname { font-size: .62rem; color: #5d7da3; }
+        .world-dot .wname { font-size: .62rem; color: var(--cx-ink-faint-text); }
         .world-dot .wstatus { font-size: .6rem; font-weight: 600; }
-        .world-dot .wstatus.online { color: #2ecc71; }
-        .world-dot .wstatus.delayed { color: #f39c12; }
+        .world-dot .wstatus.online { color: var(--cx-accent-text); }
+        .world-dot .wstatus.delayed { color: var(--cx-hype-text); }
+        .world-dot .wunits { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--cx-orange-deep); font-weight: 600; }
+        .world-dot .wunit-label { font-size: .58rem; color: var(--cx-ink-faint-text); }
 
         /* Bottom full-width */
         .full-width { grid-column: 1 / -1; }
@@ -191,16 +209,16 @@
         .throughput { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
         .throughput-gauge { text-align: center; }
         .throughput-gauge canvas { display: block; margin: 0 auto; }
-        .throughput-gauge .tg-label { font-size: .7rem; color: #5d7da3; margin-top: .3rem; text-transform: uppercase; }
-        .throughput-gauge .tg-val { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; color: #6366f1; }
+        .throughput-gauge .tg-label { font-size: .7rem; color: var(--cx-ink-faint-text); margin-top: .3rem; text-transform: uppercase; }
+        .throughput-gauge .tg-val { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--cx-orange-deep); }
 
         /* Alert ticker */
         .ticker {
-            background: rgba(99,102,241,0.05);
-            border-top: 1px solid rgba(99,102,241,0.1);
+            background: rgba(242,106,33,0.06);
+            border-top: 1px solid var(--cx-ink-faint);
             padding: .4rem 1rem;
             font-size: .72rem;
-            color: #7a92b5;
+            color: var(--cx-ink-soft);
             overflow: hidden;
             white-space: nowrap;
         }
@@ -212,7 +230,7 @@
         .ticker .alert { margin-right: 3rem; }
         .ticker .alert span { font-weight: 600; }
     </style>
-<style>.back,.topbar{display:none!important}</style><style>body{background-image:radial-gradient(rgba(99,102,241,0.13) 1px,transparent 1px)!important;background-size:24px 24px!important}</style></head>
+<style>.back,.topbar{display:none!important}</style><style>body{background-image:radial-gradient(rgba(var(--cx-ink-rgb),0.13) 1px,transparent 1px)!important;background-size:24px 24px!important}</style></head>
 <body>
 
 <a href="index.html" class="back">← Hub</a>
@@ -255,17 +273,17 @@
         <div class="panel-header"><h3>⚠️ Risk Heat Map</h3><div class="indicator" id="riskLevel">LOW</div></div>
         <div class="panel-body">
             <div style="display:flex;gap:.6rem;">
-                <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.6rem;color:#5d7da3;padding:.1rem 0;">
+                <div style="display:flex;flex-direction:column;justify-content:space-between;font-size:.6rem;color:var(--cx-ink-faint-text);padding:.1rem 0;">
                     <span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
                 </div>
                 <div style="flex:1;">
                     <div class="risk-matrix" id="riskMatrix"></div>
-                    <div style="display:flex;justify-content:space-between;font-size:.6rem;color:#5d7da3;margin-top:.2rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--cx-ink-faint-text);margin-top:.2rem;">
                         <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
                     </div>
                 </div>
             </div>
-            <div style="display:flex;justify-content:space-between;margin-top:.5rem;font-size:.62rem;color:#5d7da3;">
+            <div style="display:flex;justify-content:space-between;margin-top:.5rem;font-size:.62rem;color:var(--cx-ink-faint-text);">
                 <span>← Likelihood →</span><span>↑ Impact ↑</span>
             </div>
         </div>
@@ -285,7 +303,7 @@
         <div class="panel-body">
             <div class="world-strip" id="worldStrip"></div>
             <div style="margin-top:.8rem;">
-                <div style="font-size:.68rem;color:#5d7da3;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;">Throughput (24h rolling)</div>
+                <div style="font-size:.68rem;color:var(--cx-ink-faint-text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem;">Throughput (24h rolling)</div>
                 <div class="timeline" id="throughputTimeline"></div>
             </div>
         </div>
@@ -298,6 +316,26 @@
 </div>
 
 <script>
+// ====== CODEX PALETTE ======
+// Canvas and hex-concatenation (`color + '22'`) cannot resolve var(), so the
+// tokens are read once at load via cxToken() from codex-boot.js. codex-boot
+// stamps the theme before first paint, so these are already the right values.
+const CX = (n, f) => (window.cxToken ? window.cxToken(n, f) : f);
+const P = {
+    ink:        CX('--cx-ink', '#2b2118'),
+    inkRgb:     CX('--cx-ink-rgb', '43, 33, 24'),
+    orange:     CX('--cx-orange', '#F26A21'),
+    orangeDeep: CX('--cx-orange-deep', '#a34310'),
+    accent:     CX('--cx-accent', '#2f8f68'),
+    accentText: CX('--cx-accent-text', '#1c674a'),
+    hype:       CX('--cx-hype', '#a2731c'),
+    hypeText:   CX('--cx-hype-text', '#7a5606'),
+    info:       CX('--cx-info', '#2b7fbe'),
+    danger:     CX('--cx-danger', '#c04a45'),
+    dangerText: CX('--cx-danger-text', '#a32d2d'),
+    brandalt:   CX('--cx-brandalt', '#6f66c9'),
+};
+
 // ====== CLOCK ======
 function updateClock() {
     const now = new Date();
@@ -308,14 +346,15 @@ updateClock();
 
 // ====== KPIs ======
 const kpis = [
-    { label: 'OEE', value: '87.3%', delta: '+2.1%', dir: 'up', color: '#2ecc71' },
-    { label: 'Yield Rate', value: '96.1%', delta: '+0.4%', dir: 'up', color: '#6366f1' },
-    { label: 'Cycle Time', value: '34.2s', delta: '-1.8s', dir: 'up', color: '#2ecc71' },
-    { label: 'Defect Rate', value: '0.12%', delta: '-0.03%', dir: 'up', color: '#2ecc71' },
-    { label: 'Inventory Turn', value: '12.4x', delta: '+0.8x', dir: 'up', color: '#6366f1' },
-    { label: 'Lead Time', value: '18.5d', delta: '+1.2d', dir: 'down', color: '#f39c12' },
-    { label: 'MTBF', value: '842h', delta: '+26h', dir: 'up', color: '#2ecc71' },
-    { label: 'Cost/Unit', value: '$4.21', delta: '-$0.14', dir: 'up', color: '#2ecc71' },
+    // KPI numbers are ~21px text, so they take the *-text tokens, not the fills.
+    { label: 'OEE', value: '87.3%', delta: '+2.1%', dir: 'up', color: P.accentText },
+    { label: 'Yield Rate', value: '96.1%', delta: '+0.4%', dir: 'up', color: P.orangeDeep },
+    { label: 'Cycle Time', value: '34.2s', delta: '-1.8s', dir: 'up', color: P.accentText },
+    { label: 'Defect Rate', value: '0.12%', delta: '-0.03%', dir: 'up', color: P.accentText },
+    { label: 'Inventory Turn', value: '12.4x', delta: '+0.8x', dir: 'up', color: P.orangeDeep },
+    { label: 'Lead Time', value: '18.5d', delta: '+1.2d', dir: 'down', color: P.hypeText },
+    { label: 'MTBF', value: '842h', delta: '+26h', dir: 'up', color: P.accentText },
+    { label: 'Cost/Unit', value: '$4.21', delta: '-$0.14', dir: 'up', color: P.accentText },
 ];
 const kpiGrid = document.getElementById('kpiGrid');
 kpis.forEach(k => {
@@ -330,17 +369,19 @@ kpis.forEach(k => {
 const nc = document.getElementById('networkCanvas');
 const nctx = nc.getContext('2d');
 let nodes = [], edges = [], particles = [];
+// Node colours must stay 6-digit hex — the draw code appends an alpha pair
+// (`n.color + '22'`), which only works on hex, never on rgba() or var().
 const nodeTypes = [
-    { name: 'Raw Materials', icon: '⛏️', x: .08, y: .3, color: '#e67e22', size: 22 },
-    { name: 'Supplier A', icon: '🏗️', x: .2, y: .15, color: '#f39c12', size: 18 },
-    { name: 'Supplier B', icon: '🏗️', x: .2, y: .5, color: '#f39c12', size: 18 },
-    { name: 'Logistics Hub', icon: '🚛', x: .38, y: .32, color: '#9b59b6', size: 20 },
-    { name: 'Factory Floor', icon: '🏭', x: .55, y: .25, color: '#6366f1', size: 26 },
-    { name: 'Quality Lab', icon: '🔬', x: .55, y: .55, color: '#2ecc71', size: 18 },
-    { name: 'Assembly', icon: '⚙️', x: .7, y: .35, color: '#3498db', size: 22 },
-    { name: 'Warehouse', icon: '📦', x: .82, y: .2, color: '#1abc9c', size: 18 },
-    { name: 'Distribution', icon: '✈️', x: .82, y: .5, color: '#e74c3c', size: 18 },
-    { name: 'Customer', icon: '🏢', x: .94, y: .35, color: '#2ecc71', size: 22 },
+    { name: 'Raw Materials', icon: '⛏️', x: .08, y: .3, color: P.orangeDeep, size: 22 },
+    { name: 'Supplier A', icon: '🏗️', x: .2, y: .15, color: P.hype, size: 18 },
+    { name: 'Supplier B', icon: '🏗️', x: .2, y: .5, color: P.hype, size: 18 },
+    { name: 'Logistics Hub', icon: '🚛', x: .38, y: .32, color: P.brandalt, size: 20 },
+    { name: 'Factory Floor', icon: '🏭', x: .55, y: .25, color: P.orange, size: 26 },
+    { name: 'Quality Lab', icon: '🔬', x: .55, y: .55, color: P.accent, size: 18 },
+    { name: 'Assembly', icon: '⚙️', x: .7, y: .35, color: P.info, size: 22 },
+    { name: 'Warehouse', icon: '📦', x: .82, y: .2, color: P.brandalt, size: 18 },
+    { name: 'Distribution', icon: '✈️', x: .82, y: .5, color: P.danger, size: 18 },
+    { name: 'Customer', icon: '🏢', x: .94, y: .35, color: P.accent, size: 22 },
 ];
 const edgeDef = [[0,1],[0,2],[1,3],[2,3],[3,4],[4,5],[4,6],[5,6],[6,7],[6,8],[7,9],[8,9]];
 
@@ -381,7 +422,7 @@ function drawNetwork() {
         nctx.beginPath();
         nctx.moveTo(from.px, from.py);
         nctx.lineTo(to.px, to.py);
-        nctx.strokeStyle = 'rgba(99,102,241,0.12)';
+        nctx.strokeStyle = `rgba(${P.inkRgb},0.22)`;
         nctx.lineWidth = 1.5;
         nctx.stroke();
     });
@@ -396,11 +437,9 @@ function drawNetwork() {
         const realX = p.x, realY = p.y;
         nctx.beginPath();
         nctx.arc(realX, realY, 2.5, 0, Math.PI * 2);
-        nctx.fillStyle = p.color + 'cc';
-        nctx.shadowColor = p.color;
-        nctx.shadowBlur = 8;
+        // A coloured bloom reads as a smudge on parchment — solid dot instead.
+        nctx.fillStyle = p.color;
         nctx.fill();
-        nctx.shadowBlur = 0;
     });
 
     // Nodes
@@ -408,20 +447,20 @@ function drawNetwork() {
         const hovered = i === hoveredNode;
         const s = hovered ? n.size + 6 : n.size;
 
-        // Glow
+        // Halo
         nctx.beginPath();
         nctx.arc(n.px, n.py, s + 8, 0, Math.PI * 2);
         const grd = nctx.createRadialGradient(n.px, n.py, s * .5, n.px, n.py, s + 8);
-        grd.addColorStop(0, n.color + '22');
+        grd.addColorStop(0, n.color + '1a');
         grd.addColorStop(1, 'transparent');
         nctx.fillStyle = grd;
         nctx.fill();
 
-        // Circle
+        // Circle — tints sit on paper now, so the ring carries the weight
         nctx.beginPath();
         nctx.arc(n.px, n.py, s, 0, Math.PI * 2);
-        nctx.fillStyle = n.color + (hovered ? '44' : '22');
-        nctx.strokeStyle = n.color + (hovered ? 'cc' : '66');
+        nctx.fillStyle = n.color + (hovered ? '33' : '1f');
+        nctx.strokeStyle = n.color + (hovered ? 'ff' : 'aa');
         nctx.lineWidth = hovered ? 2.5 : 1.5;
         nctx.fill();
         nctx.stroke();
@@ -435,7 +474,7 @@ function drawNetwork() {
         // Label
         if (hovered) {
             nctx.font = '600 11px Inter';
-            nctx.fillStyle = '#fff';
+            nctx.fillStyle = P.ink;
             nctx.fillText(n.name, n.px, n.py + s + 14);
         }
     });
@@ -461,7 +500,7 @@ scenarios.forEach((s, i) => {
     </div>`;
 });
 scEl.innerHTML += `<button class="sc-btn" onclick="runScenario()">▶ Run Simulation</button>
-<div id="scenarioResult" style="margin-top:.6rem;font-size:.82rem;color:#8a9dba;line-height:1.5;"></div>`;
+<div id="scenarioResult" class="sc-result"></div>`;
 
 function runScenario() {
     const vals = scenarios.map((_, i) => +document.getElementById('sc' + i).value);
@@ -472,26 +511,30 @@ function runScenario() {
     const costImpact = ((demand / 100 - 1) * 15 + risk * 3 - (auto - 50) * 0.1).toFixed(1);
     const riskScore = Math.min(10, risk + (demand > 150 ? 2 : 0) + (lead > 30 ? 1 : 0) - auto * 0.02).toFixed(1);
 
-    const color = riskScore < 4 ? '#2ecc71' : riskScore < 7 ? '#f39c12' : '#e74c3c';
+    const tone = riskScore < 4 ? 'good' : riskScore < 7 ? 'warn' : 'bad';
+    const costTone = costImpact > 0 ? 'bad' : 'good';
     document.getElementById('scenarioResult').innerHTML =
-        `<div style="border-left:3px solid ${color};padding-left:.6rem;">
+        `<div class="sc-verdict rule-${tone}">
         <strong>Simulation Result:</strong><br>
-        OEE: <span style="color:#6366f1;font-weight:700">${efficiency}%</span> · 
-        Throughput: <span style="color:#6366f1;font-weight:700">${throughput}</span> units/day<br>
-        Cost Impact: <span style="color:${costImpact > 0 ? '#e74c3c' : '#2ecc71'};font-weight:700">${costImpact > 0 ? '+' : ''}${costImpact}%</span> · 
-        Risk: <span style="color:${color};font-weight:700">${riskScore}/10</span>
+        OEE: <span class="sc-figure">${efficiency}%</span> ·
+        Throughput: <span class="sc-figure">${throughput}</span> units/day<br>
+        Cost Impact: <span class="tone-${costTone}">${costImpact > 0 ? '+' : ''}${costImpact}%</span> ·
+        Risk: <span class="tone-${tone}">${riskScore}/10</span>
         </div>`;
 
     addLogEntry('Scenario simulation executed', 'ok');
 }
 
 // ====== RISK MATRIX ======
+// Heat ramp on the semantic scale: accent (safe) → hype (watch) → danger (act)
+// → danger-text (the two deepest bands). Hex only — an alpha pair is appended.
+const RC_OK = P.accent, RC_WARN = P.hype, RC_BAD = P.danger, RC_WORST = P.dangerText;
 const riskColors = [
-    ['#2ecc71','#2ecc71','#f39c12','#f39c12','#e74c3c'],
-    ['#2ecc71','#f39c12','#f39c12','#e74c3c','#e74c3c'],
-    ['#f39c12','#f39c12','#e74c3c','#e74c3c','#e74c3c'],
-    ['#f39c12','#e74c3c','#e74c3c','#c0392b','#c0392b'],
-    ['#e74c3c','#e74c3c','#c0392b','#c0392b','#8e0000'],
+    [RC_OK,   RC_OK,    RC_WARN, RC_WARN,  RC_BAD],
+    [RC_OK,   RC_WARN,  RC_WARN, RC_BAD,   RC_BAD],
+    [RC_WARN, RC_WARN,  RC_BAD,  RC_BAD,   RC_BAD],
+    [RC_WARN, RC_BAD,   RC_BAD,  RC_WORST, RC_WORST],
+    [RC_BAD,  RC_BAD,   RC_WORST,RC_WORST, RC_WORST],
 ];
 const riskLabels = [
     ['Seal wear','Voltage sag','Motor heat','Bearing fail','Shaft break'],
@@ -568,8 +611,8 @@ facilities.forEach(f => {
         <div class="flag">${f.flag}</div>
         <div class="wname">${f.name}</div>
         <div class="wstatus ${f.status}">${f.status === 'online' ? '● Online' : '◐ Delayed'}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#6366f1;font-weight:600;">${f.units}</div>
-        <div style="font-size:.58rem;color:#5d7da3;">units/day</div>
+        <div class="wunits">${f.units}</div>
+        <div class="wunit-label">units/day</div>
     </div>`;
 });
 
@@ -577,8 +620,9 @@ facilities.forEach(f => {
 const tpEl = document.getElementById('throughputTimeline');
 const tpData = Array.from({length: 48}, () => 40 + Math.random() * 60);
 tpData.forEach((v, i) => {
-    const color = v > 80 ? '#2ecc71' : v > 55 ? '#6366f1' : '#f39c12';
-    tpEl.innerHTML += `<div class="tbar" style="height:${v}%;background:${color};opacity:${0.4 + (i/48)*0.6}"></div>`;
+    // Bars are graphics -> bare fill tokens, carried by class so they stay var().
+    const band = v > 80 ? 'bar-good' : v > 55 ? 'bar-brand' : 'bar-warn';
+    tpEl.innerHTML += `<div class="tbar ${band}" style="height:${v}%;opacity:${0.4 + (i/48)*0.6}"></div>`;
 });
 
 // ====== TICKER ======

@@ -9,22 +9,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Discovery Simulator</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="../codex.css">
+  <script src="../codex-boot.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Local names kept (every existing call site still works) but they are now
+       pure ALIASES of codex.css. Never give one its own literal value. */
     :root {
-      --bg:          #0a0a0a;
-      --bg-card:     #111111;
-      --bg-card-alt: #161616;
-      --border:      #1e1e1e;
-      --border-mid:  #2a2a2a;
-      --text:        #e8e8e8;
-      --text-muted:  #666;
-      --text-dim:    #333;
-      --accent:      #5b8def;
-      --accent-glow: rgba(91,141,239,0.15);
-      --accent-dark: #3b6dcf;
-      --green:       #3ecf8e;
+      --bg:          var(--cx-paper-deep);
+      --bg-card:     var(--cx-card);
+      --bg-card-alt: var(--cx-well);
+      --border:      var(--cx-ink-faint);
+      --border-mid:  var(--cx-ink-dim);
+      --text:        var(--cx-ink);
+      --text-muted:  var(--cx-ink-soft);
+      --text-dim:    var(--cx-ink-faint-text);
+      --accent:      var(--cx-orange);         /* fills, rails, focus rings     */
+      --accent-text: var(--cx-orange-deep);    /* orange TEXT under 24px        */
+      --accent-glow: rgba(242, 106, 33, .18);  /* its wash — no token for this  */
+      --accent-dark: var(--cx-orange-deep);
+      --green:       var(--cx-accent);         /* fill                          */
+      --green-text:  var(--cx-accent-text);    /* text                          */
       --radius:      10px;
       --radius-sm:   6px;
       --font:        -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -41,7 +47,7 @@
       padding: 32px 24px 56px;
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--accent-text); text-decoration: none; }
 
     .wrap {
       max-width: 680px;
@@ -65,7 +71,8 @@
       transition: background 0.3s;
       flex-shrink: 0;
     }
-    .phase-dot.active   { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
+    /* a glow has no paper equivalent — the active dot gets a wash ring instead */
+    .phase-dot.active   { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
     .phase-dot.complete { background: var(--green); }
     .phase-line { width: 20px; height: 1px; background: var(--border-mid); }
 
@@ -73,7 +80,7 @@
     .phase-label {
       font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--accent); margin-bottom: 6px;
+      color: var(--accent-text); margin-bottom: 6px;
     }
     .phase-title {
       font-size: clamp(20px, 3.5vw, 28px);
@@ -123,13 +130,14 @@
       transition: all 0.15s; border: none; white-space: nowrap;
       font-family: var(--font);
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-dark); }
+    /* ink on orange — never white (white on #F26A21 is 3.06:1) */
+    .btn-primary { background: var(--accent); color: var(--cx-on-orange); }
+    .btn-primary:hover { background: var(--accent-dark); color: var(--cx-paper); }
     .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border-mid); }
     .btn-ghost:hover { background: var(--bg-card-alt); color: var(--text); }
     .btn-row { display: flex; justify-content: flex-end; margin-top: 12px; }
 
-    .error-msg { font-size: 11px; color: #e05a5a; margin-top: 6px; }
+    .error-msg { font-size: 11px; color: var(--cx-danger-text); margin-top: 6px; }
 
     /* Persona grid */
     .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -176,8 +184,8 @@
       font-size: 9px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.07em; color: var(--text-dim);
     }
-    .bubble-persona .bubble-role { color: var(--accent); }
-    .bubble-you .bubble-role { color: var(--green); }
+    .bubble-persona .bubble-role { color: var(--accent-text); }
+    .bubble-you .bubble-role { color: var(--green-text); }
 
     .bubble-body {
       background: var(--bg-card); border: 1px solid var(--border);
@@ -198,8 +206,8 @@
     }
     .generate-prompt p { font-size: 13px; color: var(--text-muted); }
     .btn-generate {
-      background: linear-gradient(135deg, var(--accent), #7c5cbf);
-      color: #fff; padding: 10px 24px; font-size: 13px;
+      background: var(--accent);
+      color: var(--cx-on-orange); padding: 10px 24px; font-size: 13px;
       border-radius: var(--radius); border: none;
       font-family: var(--font); font-weight: 600;
       cursor: pointer; transition: opacity 0.15s;
@@ -234,7 +242,7 @@
     }
     .output-content h3 {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--accent); margin: 18px 0 7px;
+      letter-spacing: 0.07em; color: var(--accent-text); margin: 18px 0 7px;
     }
     .output-content p { color: var(--text); margin-bottom: 9px; }
     .output-content ul, .output-content ol { padding-left: 18px; margin-bottom: 9px; }
@@ -246,7 +254,7 @@
       font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
     }
     .output-content td { padding: 7px 10px; border: 1px solid var(--border); color: var(--text); vertical-align: top; }
-    .output-content tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .output-content tr:nth-child(even) td { background: rgba(var(--cx-ink-rgb), 0.04); }
     .output-content strong { color: var(--text); font-weight: 600; }
     .output-footer { display: flex; justify-content: space-between; margin-top: 14px; }
 
@@ -360,7 +368,16 @@
 </div>
 <script>
 const API = 'https://ai-discovery-simulator.vercel.app/api/claude';
-const COLORS  = ['#5b8def','#3ecf8e','#f0a04b'];
+
+/* Colours written into inline styles cannot be var() — they are resolved here
+   from the codex tokens at load time (cxToken comes from codex-boot.js).
+   The *-text rungs are used because these tint 9–14px labels, not just rails. */
+const cx = (name, fallback) => (window.cxToken ? window.cxToken(name, fallback) : fallback);
+const COLORS  = [
+  cx('--cx-orange-deep', '#a34310'),
+  cx('--cx-accent-text', '#1c674a'),
+  cx('--cx-hype-text',   '#7a5606'),
+];
 const AVATARS = ['👩‍💻','👨‍💼','🧑‍🎨'];
 
 let state = { problem:'', personas:[], current:0, interviews:[], followupAsked:false };
@@ -431,7 +448,7 @@ function renderPersonas() {
       </div>
       <div>
         <div class="persona-detail-label" style="color:${c}">Frustrations</div>
-        <ul style="padding-left:14px;font-size:11px;color:var(--text-muted);line-height:1.6;">${frus}</ul>
+        <ul style="padding-left:14px;font-size:11px;color:${cx('--cx-ink-soft','#5c4f3d')};line-height:1.6;">${frus}</ul>
       </div>
       ${p.quote?`<div class="persona-quote" style="border-color:${c}">"${p.quote}"</div>`:''}
     `;
@@ -517,7 +534,7 @@ async function nextPersona() {
       const brief = await genBrief();
       hideLoading();
       $('brief').innerHTML = marked.parse(brief);
-    } catch(e) { hideLoading(); $('brief').innerHTML = `<p style="color:#e05a5a">${e.message}</p>`; }
+    } catch(e) { hideLoading(); $('brief').innerHTML = `<p style="color:${cx('--cx-danger-text','#a32d2d')}">${e.message}</p>`; }
   } else {
     state.current++;
     loadInterview();

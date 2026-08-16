@@ -8,13 +8,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Usage Dashboard — Roman Martins Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../codex.css">
+    <script src="../codex-boot.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: #080810; color: #e4eaf4; margin: 0; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: var(--cx-paper-deep); color: var(--cx-ink); margin: 0; min-height: 100vh; }
 
         .hero {
-            background: linear-gradient(135deg, #080810 0%, #0f0f1a 40%, #1a1a2e 70%, #312e81 100%);
+            background:
+                linear-gradient(115deg, rgba(242,106,33,0.08), transparent 34%, rgba(43,127,190,0.05) 78%, transparent),
+                radial-gradient(circle at 74% 18%, rgba(242,106,33,0.12), transparent 32%),
+                linear-gradient(135deg, var(--cx-glow) 0%, var(--cx-paper) 45%, var(--cx-paper-deep) 100%);
             padding: 4rem 1.5rem 3rem;
             text-align: center;
             position: relative;
@@ -27,7 +32,7 @@
             right: -15%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(242,106,33,0.12) 0%, transparent 70%);
             border-radius: 50%;
         }
         .hero::after {
@@ -37,14 +42,14 @@
             left: -10%;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(30,72,143,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(43,127,190,0.10) 0%, transparent 70%);
             border-radius: 50%;
         }
         .badge {
             display: inline-block;
-            background: rgba(99,102,241,0.15);
-            border: 1px solid rgba(99,102,241,0.3);
-            color: #6366f1;
+            background: rgba(242,106,33,0.10);
+            border: 1px solid rgba(242,106,33,0.30);
+            color: var(--cx-orange-deep);
             font-size: .78rem;
             font-weight: 600;
             letter-spacing: .08em;
@@ -53,23 +58,25 @@
             border-radius: 20px;
             margin-bottom: 1.2rem;
         }
-        h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; color: #fff; margin-bottom: .4rem; position: relative; }
-        h1 span { color: #6366f1; }
-        .subtitle { color: #94a7c8; font-size: 1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+        /* 2rem+ display type may carry the bright orange; anything under 24px
+           uses --cx-orange-deep. */
+        h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; color: var(--cx-ink); margin-bottom: .4rem; position: relative; }
+        h1 span { color: var(--cx-orange); }
+        .subtitle { color: var(--cx-ink-soft); font-size: 1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
         .nav {
             display: flex;
             justify-content: center;
             gap: .6rem;
             padding: 1.2rem 1rem;
-            background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: var(--cx-raise);
+            border-bottom: 1px solid var(--cx-ink-faint);
             flex-wrap: wrap;
         }
         .nav a {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #8a9dba;
+            background: var(--cx-card);
+            border: 1px solid var(--cx-ink-faint);
+            color: var(--cx-ink-soft);
             padding: .5rem 1.1rem;
             border-radius: 8px;
             text-decoration: none;
@@ -77,7 +84,7 @@
             font-weight: 600;
             transition: all .2s;
         }
-        .nav a:hover, .nav a.active { border-color: rgba(99,102,241,0.4); color: #6366f1; background: rgba(99,102,241,0.1); }
+        .nav a:hover, .nav a.active { border-color: var(--cx-orange-deep); color: var(--cx-orange-deep); background: rgba(242,106,33,0.10); }
 
         .stats {
             display: flex;
@@ -87,8 +94,8 @@
             flex-wrap: wrap;
         }
         .stat { text-align: center; }
-        .stat .num { font-size: 1.8rem; font-weight: 800; color: #6366f1; }
-        .stat .label { font-size: .78rem; color: #5d7da3; margin-top: .15rem; text-transform: uppercase; letter-spacing: .06em; }
+        .stat .num { font-size: 1.8rem; font-weight: 800; color: var(--cx-orange-deep); }
+        .stat .label { font-size: .78rem; color: var(--cx-ink-faint-text); margin-top: .15rem; text-transform: uppercase; letter-spacing: .06em; }
 
         .grid {
             display: grid;
@@ -101,13 +108,13 @@
             z-index: 2;
         }
         .card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--cx-card);
+            border: 1px solid var(--cx-ink-faint);
             backdrop-filter: blur(8px);
             border-radius: 14px;
             padding: 1.8rem;
             text-decoration: none;
-            color: #e4eaf4;
+            color: var(--cx-ink);
             transition: border-color .25s, transform .25s, box-shadow .25s;
             position: relative;
             overflow: hidden;
@@ -117,18 +124,18 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, #6366f1, #312e81);
+            background: linear-gradient(90deg, var(--cx-orange), var(--cx-orange-deep));
             opacity: 0;
             transition: opacity .25s;
         }
         .card:hover {
-            border-color: rgba(99,102,241,0.4);
+            border-color: rgba(242,106,33,0.45);
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(99,102,241,0.1);
+            box-shadow: 0 8px 28px rgba(242,106,33,0.10);
         }
         .card:hover::before { opacity: 1; }
-        .card .value { font-size: 2.5rem; font-weight: 800; color: #6366f1; margin-bottom: .5rem; }
-        .card .detail { font-size: .85rem; color: #8a9dba; }
+        .card .value { font-size: 2.5rem; font-weight: 800; color: var(--cx-orange-deep); margin-bottom: .5rem; }
+        .card .detail { font-size: .85rem; color: var(--cx-ink-soft); }
         .card .tag {
             display: inline-block;
             margin-top: 1rem;
@@ -138,9 +145,9 @@
             letter-spacing: .06em;
             padding: .25rem .7rem;
             border-radius: 4px;
-            background: rgba(99,102,241,0.1);
-            color: #6366f1;
-            border: 1px solid rgba(99,102,241,0.2);
+            background: rgba(242,106,33,0.10);
+            color: var(--cx-orange-deep);
+            border: 1px solid rgba(242,106,33,0.28);
         }
 
         .table-section {
@@ -154,40 +161,42 @@
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
-            color: #fff;
+            color: var(--cx-ink);
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--cx-card);
+            border: 1px solid var(--cx-ink-faint);
             backdrop-filter: blur(8px);
             border-radius: 14px;
             overflow: hidden;
         }
         th {
-            background: rgba(255,255,255,0.06);
+            background: var(--cx-raise);
             padding: 1rem 1.5rem;
             text-align: left;
             font-size: .85rem;
-            color: #8a9dba;
+            color: var(--cx-ink-soft);
             font-weight: 600;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid var(--cx-ink-faint);
             text-transform: uppercase;
             letter-spacing: .06em;
         }
         td {
             padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--cx-divider);
             font-size: .9rem;
         }
         tr:last-child td { border-bottom: none; }
-        .timestamp { color: #5d7da3; }
-        .status { color: #6366f1; font-weight: 600; }
+        .timestamp { color: var(--cx-ink-faint-text); }
+        /* "✓ Complete" is a verified state, so it reads on the semantic accent
+           rather than the brand orange. */
+        .status { color: var(--cx-accent-text); font-weight: 600; }
 
         .chart-section {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--cx-card);
+            border: 1px solid var(--cx-ink-faint);
             backdrop-filter: blur(8px);
             border-radius: 14px;
             padding: 2rem 1.8rem;
@@ -200,19 +209,19 @@
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
-            color: #fff;
+            color: var(--cx-ink);
         }
         .progress-bar {
             width: 100%;
             height: 10px;
-            background: rgba(255,255,255,0.08);
+            background: var(--cx-well);
             border-radius: 10px;
             overflow: hidden;
             margin: 1rem 0;
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #6366f1, #312e81);
+            background: linear-gradient(90deg, var(--cx-orange), var(--cx-orange-deep));
             width: 13%;
             border-radius: 10px;
             transition: width .3s ease;
@@ -221,13 +230,13 @@
         .footer {
             text-align: center;
             padding: 2.5rem 1rem;
-            color: #4a6080;
+            color: var(--cx-ink-faint-text);
             font-size: .82rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid var(--cx-divider);
         }
-        .footer a { color: #6366f1; text-decoration: none; }
+        .footer a { color: var(--cx-orange-deep); text-decoration: none; }
     </style>
-<style>.back,.nav{display:none!important}</style><style>body{background-image:radial-gradient(rgba(99,102,241,0.13) 1px,transparent 1px)!important;background-size:24px 24px!important}</style></head>
+<style>.back,.nav{display:none!important}</style><style>body{background-image:radial-gradient(rgba(var(--cx-ink-rgb),0.13) 1px,transparent 1px)!important;background-size:24px 24px!important}</style></head>
 <body>
 
     <section class="hero">
@@ -407,13 +416,13 @@
     <div class="chart-section">
         <h3 class="chart-title">📦 Context Window Usage</h3>
         <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
-            <span style="color: #8a9dba;">26.4K / 200K tokens</span>
-            <strong style="color: #6366f1;">13%</strong>
+            <span style="color: var(--cx-ink-soft);">26.4K / 200K tokens</span>
+            <strong style="color: var(--cx-orange-deep);">13%</strong>
         </div>
         <div class="progress-bar">
             <div class="progress-fill"></div>
         </div>
-        <p style="font-size: .85rem; color: #5d7da3; margin-top: 1rem;">179.6K tokens remaining in current context window</p>
+        <p style="font-size: .85rem; color: var(--cx-ink-faint-text); margin-top: 1rem;">179.6K tokens remaining in current context window</p>
     </div>
 
     <div class="footer">

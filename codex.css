@@ -1,0 +1,185 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CODEX — shared palette for Roman's Lab (2026-08-16)
+
+   Mirrors lib/codex.ts on romanmartins.com EXACTLY so the two properties are
+   one brand. If a value changes there, change it here (and vice versa).
+
+   Every page in this repo is a standalone HTML file, so this is the only
+   shared surface: link it from <head>, then use var(--cx-*) everywhere.
+
+   THEME: light (parchment) is default; night codex (aged leather) is opt-in
+   via [data-codex=dark] on <html>, set by codex-boot.js before paint.
+
+   RULES (learned the hard way on the main site — do not relearn them):
+   - Text ON solid orange uses --cx-on-orange, NEVER white (white is 3.06:1).
+   - Orange text under ~24px uses --cx-orange-deep; 24px+ display may use
+     --cx-orange. Shapes/rails/icons may always use --cx-orange.
+   - A "raised" panel on paper is an ink WASH, never lighter than the sheet.
+     Real elevation is the hard offset stamp --cx-elev, not a glow.
+   - Never put text on a solid accent fill — none clears 4.5:1. Use the wash.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --cx-paper: #f4ecd8;
+  --cx-paper-deep: #ecdfc2;
+  --cx-glow: #f8f2e2;
+  --cx-card: rgba(252, 248, 238, .8);
+  --cx-ink: #2b2118;
+  --cx-ink-soft: #5c4f3d;
+  --cx-ink-faint: rgba(43, 33, 24, .13);
+  --cx-ink-shadow: rgba(43, 33, 24, .2);
+  --cx-shadow-hard: #2b2118;
+  --cx-orange: #F26A21;
+  --cx-orange-deep: #a34310;
+  --cx-on-orange: #2b2118;
+  --cx-ink-bg: #241a10;
+  --cx-parch-text: rgba(244, 236, 216, .78);
+  --cx-ink-rgb: 43, 33, 24;
+  --cx-card-rgb: 252, 248, 238;
+  --cx-header-bg: rgba(246, 239, 223, .92);
+  --cx-portrait-filter: sepia(.14) saturate(.94);
+
+  --cx-ink-tertiary: rgba(43, 33, 24, .72);
+  --cx-ink-faint-text: rgba(43, 33, 24, .66);
+  --cx-ink-dim: rgba(43, 33, 24, .40); /* NON-TEXT only — 2.3:1 by design */
+  --cx-rule-strong: rgba(43, 33, 24, .52);
+  --cx-divider: rgba(43, 33, 24, .09);
+  --cx-raise: rgba(43, 33, 24, .05);
+  --cx-raise-strong: rgba(43, 33, 24, .12);
+  --cx-well: rgba(43, 33, 24, .07);
+
+  /* semantic ramp — fill (graphics ≥3:1) · text (≥4.5:1) · wash (chip bed) */
+  --cx-accent: #2f8f68;
+  --cx-accent-text: #1c674a;
+  --cx-accent-wash: rgba(47, 143, 104, .13);
+  --cx-hype: #a2731c;
+  --cx-hype-text: #7a5606;
+  --cx-hype-wash: rgba(162, 115, 28, .14);
+  --cx-info: #2b7fbe;
+  --cx-info-text: #155e96;
+  --cx-info-wash: rgba(43, 127, 190, .13);
+  --cx-danger: #c04a45;
+  --cx-danger-text: #a32d2d;
+  --cx-danger-wash: rgba(192, 74, 69, .12);
+  --cx-brandalt: #6f66c9;
+  --cx-brandalt-text: #534ab7;
+  --cx-brandalt-wash: rgba(111, 102, 201, .13);
+
+  --cx-elev: 4px 4px 0 0 var(--cx-ink-shadow);
+  color-scheme: light;
+}
+
+:root[data-codex=dark] {
+  --cx-paper: #211911;
+  --cx-paper-deep: #191208;
+  --cx-glow: #2a2015;
+  --cx-card: rgba(45, 36, 25, .8);
+  --cx-ink: #ede3c9;
+  --cx-ink-soft: #b5a487;
+  --cx-ink-faint: rgba(237, 227, 201, .08);
+  --cx-ink-shadow: rgba(8, 5, 2, .6);
+  --cx-shadow-hard: #0c0703;
+  --cx-orange: #F26A21;
+  --cx-orange-deep: #ff8f52;
+  --cx-on-orange: #2b2118;
+  --cx-ink-bg: #150e06;
+  --cx-ink-rgb: 237, 227, 201;
+  --cx-card-rgb: 45, 36, 25;
+  --cx-header-bg: rgba(30, 23, 15, .92);
+  --cx-portrait-filter: sepia(.22) saturate(.88) brightness(.87) contrast(1.05);
+
+  --cx-ink-tertiary: rgba(237, 227, 201, .64);
+  --cx-ink-faint-text: rgba(237, 227, 201, .55);
+  --cx-ink-dim: rgba(237, 227, 201, .38);
+  --cx-rule-strong: rgba(237, 227, 201, .40);
+  --cx-divider: rgba(237, 227, 201, .07);
+  --cx-raise: rgba(237, 227, 201, .05);
+  --cx-raise-strong: rgba(237, 227, 201, .12);
+  --cx-well: rgba(8, 5, 2, .35);
+
+  --cx-accent: #4aa87d;
+  --cx-accent-text: #6ab98f;
+  --cx-accent-wash: rgba(74, 168, 125, .16);
+  --cx-hype: #dea644;
+  --cx-hype-text: #d9ad55;
+  --cx-hype-wash: rgba(222, 166, 68, .16);
+  --cx-info: #5a96d2;
+  --cx-info-text: #8ab4dd;
+  --cx-info-wash: rgba(90, 150, 210, .15);
+  --cx-danger: #e06e5f;
+  --cx-danger-text: #e6968a;
+  --cx-danger-wash: rgba(224, 110, 95, .14);
+  --cx-brandalt: #8c82dc;
+  --cx-brandalt-text: #aaa2e8;
+  --cx-brandalt-wash: rgba(140, 130, 220, .15);
+
+  color-scheme: dark;
+}
+
+/* a dark-eval print must never emit chalk-on-white */
+@media print {
+  :root[data-codex=dark] {
+    --cx-paper: #f4ecd8; --cx-paper-deep: #ecdfc2; --cx-card: rgba(252,248,238,.8);
+    --cx-ink: #2b2118; --cx-ink-soft: #5c4f3d; --cx-ink-rgb: 43, 33, 24;
+    --cx-orange-deep: #a34310; --cx-shadow-hard: #2b2118;
+    color-scheme: light;
+  }
+}
+
+/* ── base ────────────────────────────────────────────────────────────────── */
+
+.cx-body {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 31px, var(--cx-ink-faint) 31px 32px),
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--cx-ink-faint) 31px 32px),
+    radial-gradient(ellipse at 30% 20%, var(--cx-glow) 0%, var(--cx-paper) 55%, var(--cx-paper-deep) 100%);
+  background-attachment: fixed;
+  color: var(--cx-ink);
+  font-family: Fraunces, Georgia, 'Times New Roman', serif;
+}
+
+/* hand-inked card — the codex's one card idiom */
+.cx-card {
+  background: var(--cx-card);
+  border: 2px solid var(--cx-ink);
+  border-radius: 12px;
+  box-shadow: var(--cx-elev);
+}
+
+.cx-btn {
+  display: inline-block;
+  background: var(--cx-orange);
+  color: var(--cx-on-orange);
+  border: 2px solid var(--cx-ink);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 0 var(--cx-shadow-hard);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .15s;
+}
+.cx-btn:hover { transform: translateY(-2px); }
+
+.cx-btn-quiet {
+  display: inline-block;
+  background: rgba(var(--cx-card-rgb), .85);
+  color: var(--cx-ink);
+  border: 2px solid var(--cx-ink);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 0 var(--cx-ink-shadow);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .15s;
+}
+.cx-btn-quiet:hover { transform: translateY(-2px); }
+
+/* the discreet light/dark control (mirrors the main site's header toggle) */
+.cx-theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 8px;
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--cx-ink-soft); transition: background .2s, color .2s;
+}
+.cx-theme-toggle:hover { color: var(--cx-ink); background: rgba(var(--cx-ink-rgb), .08); }
+.cx-ico-sun { display: none; }
+:root[data-codex=dark] .cx-ico-sun { display: block; }
+:root[data-codex=dark] .cx-ico-moon { display: none; }

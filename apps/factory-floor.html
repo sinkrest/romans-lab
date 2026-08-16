@@ -8,14 +8,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Factory Floor — Roman's Lab</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../codex.css">
+<script src="../codex-boot.js"></script>
 <style>
+/* Page chrome only. The canvas below is a GAME — its palette is baked into the
+   JS draw calls (canvas cannot resolve var()), so the board art is left alone. */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: #080810;
+  background: var(--cx-paper-deep);
   font-family: 'Inter', sans-serif;
-  color: #e4eaf4;
+  color: var(--cx-ink);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,119 +27,122 @@ body {
   overflow-x: hidden;
 }
 
-.back { position: absolute; top: 1rem; left: 1rem; color: #6366f1; text-decoration: none; font-size: .85rem; z-index: 10; }
+.back { position: absolute; top: 1rem; left: 1rem; color: var(--cx-orange-deep); text-decoration: none; font-size: .85rem; z-index: 10; }
 
 .header {
-  background: linear-gradient(135deg, #080810 0%, #0f0f1a 50%, #1a1a2e 100%);
+  background: linear-gradient(135deg, var(--cx-glow) 0%, var(--cx-paper) 50%, var(--cx-paper-deep) 100%);
   width: 100%; text-align: center; padding: 1rem 1rem .6rem; position: relative;
 }
 .badge {
-  display: inline-block; background: rgba(99,102,241,0.15);
-  border: 1px solid rgba(99,102,241,0.3); color: #6366f1;
+  display: inline-block; background: rgba(242,106,33,0.12);
+  border: 1px solid rgba(242,106,33,0.3); color: var(--cx-orange-deep);
   font-size: .7rem; font-weight: 600; letter-spacing: .08em;
   text-transform: uppercase; padding: .2rem .7rem; border-radius: 20px; margin-bottom: .3rem;
 }
-h1 { font-size: 1.3rem; font-weight: 800; color: #fff; }
-h1 span { color: #6366f1; }
+h1 { font-size: 1.3rem; font-weight: 800; color: var(--cx-ink); }
+/* 1.3rem ≈ 21px — under 24px, so the deep orange is mandatory here */
+h1 span { color: var(--cx-orange-deep); }
 
 .hud {
   display: flex; justify-content: center; gap: .5rem; padding: .5rem;
-  background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: var(--cx-raise); border-bottom: 1px solid var(--cx-ink-faint);
   width: 100%; flex-wrap: wrap;
 }
 .hud-card {
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  background: var(--cx-raise); border: 1px solid var(--cx-ink-faint);
   border-radius: 8px; padding: .3rem .6rem; text-align: center; min-width: 60px;
 }
-.hud-card .label { font-size: .55rem; color: #5d7da3; text-transform: uppercase; letter-spacing: .05em; }
-.hud-card .value { font-size: .9rem; font-weight: 800; color: #6366f1; }
-.hud-card .value.green { color: #2ecc71; }
-.hud-card .value.amber { color: #f39c12; }
-.hud-card .value.red { color: #e74c3c; }
+.hud-card .label { font-size: .55rem; color: var(--cx-ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+.hud-card .value { font-size: .9rem; font-weight: 800; color: var(--cx-orange-deep); }
+.hud-card .value.green { color: var(--cx-accent-text); }
+.hud-card .value.amber { color: var(--cx-hype-text); }
+.hud-card .value.red { color: var(--cx-danger-text); }
 
 .game-area { display: flex; flex-direction: column; align-items: center; padding: .4rem; }
 
+/* the board is a lit screen on the desk: hard ink frame + stamp, never a glow */
 canvas {
   display: block; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 0 30px rgba(99,102,241,0.08);
+  border: 2px solid var(--cx-ink);
+  box-shadow: var(--cx-elev);
   cursor: crosshair;
 }
 
 .hint-bar {
-  margin-top: .3rem; font-size: .72rem; color: #94a7c8;
+  margin-top: .3rem; font-size: .72rem; color: var(--cx-ink-soft);
   text-align: center; padding: .2rem .5rem; min-height: 1.4em;
 }
-.hint-bar strong { color: #6366f1; }
+.hint-bar strong { color: var(--cx-orange-deep); }
 
 .toolbar {
   display: flex; align-items: center; gap: .35rem; padding: .5rem;
   flex-wrap: wrap; justify-content: center;
 }
 .tool-btn {
-  background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.12);
-  border-radius: 8px; padding: .45rem .65rem; color: #8a9dba; font-size: .78rem;
+  background: var(--cx-raise); border: 2px solid var(--cx-ink-dim);
+  border-radius: 8px; padding: .45rem .65rem; color: var(--cx-ink-soft); font-size: .78rem;
   font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
   -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
 }
-.tool-btn:hover { border-color: rgba(99,102,241,0.4); color: #e4eaf4; }
-.tool-btn.active { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.18); box-shadow: 0 0 14px rgba(99,102,241,0.2); }
+.tool-btn:hover { border-color: var(--cx-orange); color: var(--cx-ink); }
+.tool-btn.active { border-color: var(--cx-orange); color: var(--cx-orange-deep); background: rgba(242,106,33,0.14); box-shadow: 2px 2px 0 0 var(--cx-ink-shadow); }
 .tool-btn.locked { opacity: 0.2; pointer-events: none; }
 
-.tool-btn.run-btn { background: rgba(46,204,113,0.15); border-color: rgba(46,204,113,0.4); color: #2ecc71; }
-.tool-btn.run-btn.running { background: rgba(243,156,18,0.15); border-color: rgba(243,156,18,0.4); color: #f39c12; }
-.tool-btn.reset-btn { background: rgba(231,76,60,0.08); border-color: rgba(231,76,60,0.25); color: #e74c3c; }
+.tool-btn.run-btn { background: var(--cx-accent-wash); border-color: var(--cx-accent); color: var(--cx-accent-text); }
+.tool-btn.run-btn.running { background: var(--cx-hype-wash); border-color: var(--cx-hype); color: var(--cx-hype-text); }
+.tool-btn.reset-btn { background: var(--cx-danger-wash); border-color: var(--cx-danger); color: var(--cx-danger-text); }
 
-.sep { width: 1px; height: 22px; background: rgba(255,255,255,0.08); margin: 0 .15rem; }
+.sep { width: 1px; height: 22px; background: var(--cx-ink-faint); margin: 0 .15rem; }
 
 .overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(5,5,15,0.96); display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--cx-card-rgb),0.96); display: flex; align-items: center; justify-content: center;
   z-index: 100;
 }
 .overlay.hidden { display: none; }
 .level-select { max-width: 520px; width: 92%; text-align: center; }
-.level-select h2 { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: .2rem; }
-.level-select .sub { color: #7a92b5; font-size: .82rem; margin-bottom: .8rem; }
+.level-select h2 { font-size: 1.5rem; font-weight: 800; color: var(--cx-ink); margin-bottom: .2rem; }
+.level-select .sub { color: var(--cx-ink-soft); font-size: .82rem; margin-bottom: .8rem; }
 
 .how-to-play {
-  background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+  background: rgba(242,106,33,0.07); border: 1px solid rgba(242,106,33,0.25);
   border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; text-align: left;
 }
-.how-to-play h3 { font-size: .7rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .4rem; }
+.how-to-play h3 { font-size: .7rem; font-weight: 700; color: var(--cx-orange-deep); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .4rem; }
 .how-to-play ol { padding-left: 1.1rem; }
-.how-to-play li { font-size: .78rem; color: #94a7c8; line-height: 1.55; margin-bottom: .15rem; }
-.how-to-play li strong { color: #e4eaf4; }
+.how-to-play li { font-size: .78rem; color: var(--cx-ink-soft); line-height: 1.55; margin-bottom: .15rem; }
+.how-to-play li strong { color: var(--cx-ink); }
 
 .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-bottom: .8rem; }
 .level-btn {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  background: var(--cx-raise); border: 1px solid var(--cx-ink-dim);
   border-radius: 10px; padding: .7rem .3rem; cursor: pointer;
-  font-family: inherit; color: #e4eaf4; transition: all .15s;
+  font-family: inherit; color: var(--cx-ink); transition: all .15s;
   -webkit-tap-highlight-color: transparent; user-select: none;
 }
-.level-btn:hover:not(.locked) { border-color: rgba(99,102,241,0.5); transform: translateY(-2px); }
+.level-btn:hover:not(.locked) { border-color: var(--cx-orange); transform: translateY(-2px); }
 .level-btn:active:not(.locked) { transform: scale(0.97); }
 .level-btn.locked { opacity: 0.2; cursor: default; }
-.level-btn .num { font-size: 1rem; font-weight: 800; color: #6366f1; }
-.level-btn .stars { font-size: .65rem; color: #f39c12; margin-top: .15rem; }
-.level-btn .lname { font-size: .5rem; color: #5d7da3; margin-top: .1rem; text-transform: uppercase; letter-spacing: .04em; }
+.level-btn .num { font-size: 1rem; font-weight: 800; color: var(--cx-orange-deep); }
+.level-btn .stars { font-size: .65rem; color: var(--cx-hype-text); margin-top: .15rem; }
+.level-btn .lname { font-size: .5rem; color: var(--cx-ink-soft); margin-top: .1rem; text-transform: uppercase; letter-spacing: .04em; }
 
 .complete-box {
-  background: rgba(15,15,26,0.98); border: 1px solid rgba(99,102,241,0.3);
+  background: rgba(var(--cx-card-rgb),0.98); border: 1px solid var(--cx-ink);
+  box-shadow: var(--cx-elev);
   border-radius: 14px; padding: 1.8rem; max-width: 340px; width: 90%; text-align: center;
 }
-.complete-box h2 { font-size: 1.2rem; color: #fff; margin-bottom: .4rem; }
+.complete-box h2 { font-size: 1.2rem; color: var(--cx-ink); margin-bottom: .4rem; }
 .complete-box .stars-big { font-size: 1.8rem; margin: .4rem 0; }
-.complete-box .stat { color: #7a92b5; font-size: .82rem; margin: .15rem 0; }
-.complete-box .stat strong { color: #6366f1; }
+.complete-box .stat { color: var(--cx-ink-soft); font-size: .82rem; margin: .15rem 0; }
+.complete-box .stat strong { color: var(--cx-orange-deep); }
 .complete-box .btns { display: flex; gap: .4rem; justify-content: center; margin-top: 1rem; }
 .complete-box .btn {
-  padding: .45rem 1rem; border-radius: 8px; border: 1px solid rgba(99,102,241,0.3);
-  background: rgba(99,102,241,0.12); color: #6366f1; font-weight: 600;
+  padding: .45rem 1rem; border-radius: 8px; border: 1px solid rgba(242,106,33,0.35);
+  background: rgba(242,106,33,0.10); color: var(--cx-orange-deep); font-weight: 600;
   font-family: inherit; cursor: pointer; font-size: .82rem;
 }
-.complete-box .btn.primary { background: #6366f1; color: #fff; border-color: #6366f1; }
+.complete-box .btn.primary { background: var(--cx-orange); color: var(--cx-on-orange); border-color: var(--cx-orange); }
 </style>
 </head>
 <body>
@@ -183,8 +190,8 @@ canvas {
       <ol>
         <li><strong>Pick a level</strong> below</li>
         <li><strong>Click/tap the grid</strong> to place belts &mdash; click an existing piece to <strong>rotate</strong> it</li>
-        <li>Connect the <strong style="color:#2ecc71">green IN</strong> cells (left) to the matching <strong style="color:#4f8cff">colored OUT</strong> cells (right)</li>
-        <li>Press <strong style="color:#2ecc71">&triangleright; Run</strong> to start the flow</li>
+        <li>Connect the <strong style="color:var(--cx-accent-text)">green IN</strong> cells (left) to the matching <strong style="color:var(--cx-info-text)">colored OUT</strong> cells (right)</li>
+        <li>Press <strong style="color:var(--cx-accent-text)">&triangleright; Run</strong> to start the flow</li>
       </ol>
     </div>
     <div class="level-grid" id="level-grid"></div>
@@ -248,8 +255,9 @@ var ctx = canvas.getContext('2d');
 var DIRS = {right:{x:1,y:0}, left:{x:-1,y:0}, up:{x:0,y:-1}, down:{x:0,y:1}};
 var DIR_LIST = ['right','down','left','up'];
 
+// NB: canvas cannot resolve var() — literals only in here (codex hexes).
 var PIECE_COLORS = {
-  belt:      {bg:'#1e1e5a', border:'#6366f1', text:'#a5b4fc'},
+  belt:      {bg:'#2a2440', border:'#8c82dc', text:'#aaa2e8'},
   splitter:  {bg:'#2d1a4e', border:'#a855f7', text:'#d8b4fe'},
   processor: {bg:'#0f3d2a', border:'#22c55e', text:'#6ee7b7'},
   sorter:    {bg:'#3d3010', border:'#eab308', text:'#fde047'},

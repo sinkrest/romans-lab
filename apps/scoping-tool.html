@@ -9,24 +9,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Scoping Tool</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="../codex.css">
+  <script src="../codex-boot.js"></script>
   <style>
     /* ─── Reset ────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     /* ─── Tokens ────────────────────────────────────────────── */
+    /* Local names kept (every existing call site still works) but they are now
+       pure ALIASES of codex.css. Never give one its own literal value. */
     :root {
-      --bg:          #0a0a0a;
-      --bg-card:     #111111;
-      --bg-card-alt: #161616;
-      --border:      #1e1e1e;
-      --border-mid:  #2a2a2a;
-      --text:        #e8e8e8;
-      --text-muted:  #666;
-      --text-dim:    #444;
-      --accent:      #5b8def;
-      --accent-glow: rgba(91,141,239,0.15);
-      --accent-dark: #3b6dcf;
-      --green:       #3ecf8e;
+      --bg:          var(--cx-paper-deep);
+      --bg-card:     var(--cx-card);
+      --bg-card-alt: var(--cx-well);
+      --border:      var(--cx-ink-faint);
+      --border-mid:  var(--cx-ink-dim);
+      --text:        var(--cx-ink);
+      --text-muted:  var(--cx-ink-soft);
+      --text-dim:    var(--cx-ink-faint-text);
+      --accent:      var(--cx-orange);         /* fills, rails, focus rings     */
+      --accent-text: var(--cx-orange-deep);    /* orange TEXT under 24px        */
+      --accent-glow: rgba(242, 106, 33, .18);  /* its wash — no token for this  */
+      --accent-dark: var(--cx-orange-deep);
+      --green:       var(--cx-accent);         /* fill                          */
+      --green-text:  var(--cx-accent-text);    /* text                          */
       --radius:      10px;
       --radius-sm:   6px;
       --font-sans:   -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -132,8 +138,9 @@
       white-space: nowrap;
     }
 
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-dark); }
+    /* ink on orange — never white (white on #F26A21 is 3.06:1) */
+    .btn-primary { background: var(--accent); color: var(--cx-on-orange); }
+    .btn-primary:hover { background: var(--accent-dark); color: var(--cx-paper); }
 
     .btn-ghost {
       background: transparent;
@@ -143,8 +150,8 @@
     .btn-ghost:hover { background: var(--bg-card-alt); color: var(--text); }
 
     .btn-generate {
-      background: linear-gradient(135deg, var(--accent), #7c5cbf);
-      color: #fff;
+      background: var(--accent);
+      color: var(--cx-on-orange);
       padding: 11px 24px;
       font-size: 14px;
       border-radius: var(--radius);
@@ -158,7 +165,7 @@
     }
 
     /* ─── Error ─────────────────────────────────────────────── */
-    .error-msg { font-size: 12px; color: #e05a5a; margin-top: 8px; }
+    .error-msg { font-size: 12px; color: var(--cx-danger-text); margin-top: 8px; }
 
     /* ─── Conversation ──────────────────────────────────────── */
     .conversation-thread {
@@ -178,8 +185,8 @@
       color: var(--text-dim);
     }
 
-    .bubble-ai .bubble-role   { color: var(--accent); }
-    .bubble-user .bubble-role { color: var(--green); }
+    .bubble-ai .bubble-role   { color: var(--accent-text); }
+    .bubble-user .bubble-role { color: var(--green-text); }
 
     .bubble-body {
       background: var(--bg-card);
@@ -268,7 +275,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: var(--accent);
+      color: var(--accent-text);
       margin: 20px 0 8px;
     }
 
@@ -307,7 +314,7 @@
       vertical-align: top;
     }
 
-    .output-content tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .output-content tr:nth-child(even) td { background: rgba(var(--cx-ink-rgb), 0.04); }
     .output-content strong { color: var(--text); font-weight: 600; }
 
     .output-content code {
@@ -317,7 +324,7 @@
       padding: 1px 5px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: var(--accent);
+      color: var(--accent-text);
     }
 
     .output-footer {
@@ -338,7 +345,7 @@
     /* ─── Utility ───────────────────────────────────────────── */
     .hidden { display: none !important; }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--accent-text); text-decoration: none; }
     a:hover { text-decoration: underline; }
   </style>
 </head>

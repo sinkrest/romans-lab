@@ -5,18 +5,24 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="description" content="Roman Martins - an interactive, Bruno-Simon-inspired driving portfolio. Steer a factory rover around the floor to open real projects.">
 <title>Roman Martins — Drive the Floor</title>
+<link rel="stylesheet" href="codex.css">
+<script src="codex-boot.js"></script>
 <style>
   :root{
-    --ground:#0b0b14; --surface:#0f0f1a;
-    --emerald:#34d399; --cyan:#22d3ee; --indigo:#818cf8; --violet:#a78bfa; --amber:#f59e0b;
-    --ink:#ffffff; --ink60:rgba(255,255,255,.62); --ink40:rgba(255,255,255,.4); --ink22:rgba(255,255,255,.22);
-    --line:rgba(255,255,255,.08);
+    /* NIGHT CODEX, pinned. This page is an immersive 3D factory floor at night:
+       the scene is dark by design and WebGL cannot resolve var(), so the overlay
+       chrome uses the codex DARK values as literals rather than following the
+       site theme. Parchment chrome over a dark scene is unreadable. */
+    --ground:#191208; --surface:rgba(45,36,25,.8);
+    --emerald:var(--cx-orange); --cyan:#5a96d2; --indigo:#8c82dc; --violet:#8c82dc; --amber:#dea644;
+    --ink:#ede3c9; --ink60:#b5a487; --ink40:rgba(237,227,201,.55); --ink22:rgba(237,227,201,.38);
+    --line:rgba(237,227,201,.08);
     --mono:ui-monospace,"SF Mono",SFMono-Regular,"JetBrains Mono",Menlo,monospace;
     --sans:system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--ground);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
-  #game{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 120% at 50% 0%,#121222 0%,#0b0b14 55%,#08080f 100%)}
+  #game{position:fixed;inset:0;overflow:hidden;background:radial-gradient(120% 120% at 50% 0%,#121222 0%,#191208 55%,#08080f 100%)}
   canvas#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 
   /* ---- HUD ---- */
@@ -24,7 +30,7 @@
   #brand{top:22px;left:24px;max-width:min(46vw,420px)}
   #brand .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--emerald);opacity:.85}
   #brand h1{margin:6px 0 4px;font-size:clamp(20px,3.4vw,30px);font-weight:800;letter-spacing:-.03em;line-height:1.02}
-  #brand h1 span{background:linear-gradient(120deg,#fff,#c7d2fe 60%,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #brand h1 span{background:linear-gradient(120deg,#fff,#c7d2fe 60%,#8c82dc);-webkit-background-clip:text;background-clip:text;color:transparent}
   #brand p{margin:0;font-size:12.5px;color:var(--ink40);line-height:1.45;max-width:340px}
 
   #counter{top:22px;right:24px;text-align:right;font-family:var(--mono)}
@@ -33,7 +39,7 @@
   #counter .lbl{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink40);margin-top:2px}
 
   #hint{bottom:22px;left:24px;font-family:var(--mono);font-size:11.5px;color:var(--ink40);line-height:1.9}
-  #hint .k{display:inline-block;min-width:20px;text-align:center;padding:1px 6px;margin:0 1px;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.04);color:var(--ink60);font-size:10.5px}
+  #hint .k{display:inline-block;min-width:20px;text-align:center;padding:1px 6px;margin:0 1px;border:1px solid var(--line);border-radius:5px;background:rgba(237,227,201,.04);color:var(--ink60);font-size:10.5px}
   #hint b{color:var(--ink60);font-weight:500}
 
   #minimap{bottom:20px;right:22px;width:172px;height:124px;border:1px solid var(--line);border-radius:10px;background:rgba(8,8,15,.62);backdrop-filter:blur(6px);overflow:hidden}
@@ -58,13 +64,13 @@
   #card a.open:hover{transform:translateY(-1px);box-shadow:0 10px 24px -8px rgba(52,211,153,.5)}
   #card a.open:focus-visible{outline:2px solid #fff;outline-offset:2px}
   #card .ekey{font-family:var(--mono);font-size:11px;color:var(--ink40)}
-  #card .ekey b{border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink60);background:rgba(255,255,255,.04)}
+  #card .ekey b{border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--ink60);background:rgba(237,227,201,.04)}
 
   /* ---- top-right utility ---- */
   #util{position:absolute;z-index:6;top:74px;right:24px;display:flex;gap:8px;pointer-events:auto}
-  #util button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink60);background:rgba(255,255,255,.04);
+  #util button{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink60);background:rgba(237,227,201,.04);
     border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;transition:.18s}
-  #util button:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+  #util button:hover{color:#fff;border-color:rgba(237,227,201,.22)}
   #util button:focus-visible{outline:2px solid var(--emerald);outline-offset:2px}
 
   /* ---- intro / list overlays ---- */
@@ -74,12 +80,12 @@
   .panel{width:min(560px,100%);text-align:center}
   .panel .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--emerald)}
   .panel h1{margin:14px 0 6px;font-size:clamp(34px,7vw,58px);font-weight:800;letter-spacing:-.045em;line-height:.98}
-  .panel h1 span{background:linear-gradient(120deg,#fff,#c7d2fe 55%,#818cf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .panel h1 span{background:linear-gradient(120deg,#fff,#c7d2fe 55%,#8c82dc);-webkit-background-clip:text;background-clip:text;color:transparent}
   .panel .role{font-size:15px;color:var(--ink60);margin:0 0 18px}
   .panel .lede{font-size:14.5px;line-height:1.6;color:var(--ink60);max-width:430px;margin:0 auto 22px}
   .panel .lede b{color:#fff;font-weight:600}
   .ctl{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
-  .ctl .chip{font-family:var(--mono);font-size:11px;color:var(--ink60);border:1px solid var(--line);border-radius:8px;padding:7px 11px;background:rgba(255,255,255,.03)}
+  .ctl .chip{font-family:var(--mono);font-size:11px;color:var(--ink60);border:1px solid var(--line);border-radius:8px;padding:7px 11px;background:rgba(237,227,201,.03)}
   .ctl .chip b{color:#fff}
   .go{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:13px;border:0;cursor:pointer;
     font-family:var(--sans);font-size:15px;font-weight:700;color:#07110d;background:var(--emerald);transition:transform .16s,box-shadow .2s}
@@ -95,8 +101,8 @@
   #list h1{font-size:clamp(26px,5vw,40px);text-align:left}
   #list .glist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
   @media(max-width:560px){#list .glist{grid-template-columns:1fr}}
-  #list a.item{display:block;padding:13px 15px;border:1px solid var(--line);border-radius:12px;text-decoration:none;background:rgba(255,255,255,.02);transition:.18s}
-  #list a.item:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.045);transform:translateY(-1px)}
+  #list a.item{display:block;padding:13px 15px;border:1px solid var(--line);border-radius:12px;text-decoration:none;background:rgba(237,227,201,.02);transition:.18s}
+  #list a.item:hover{border-color:rgba(237,227,201,.2);background:rgba(237,227,201,.045);transform:translateY(-1px)}
   #list a.item:focus-visible{outline:2px solid var(--emerald);outline-offset:2px}
   #list .item .t{font-weight:600;font-size:14.5px;color:#fff}
   #list .item .s{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--ink40);margin-top:3px}
@@ -201,10 +207,10 @@
 
   // ---- station data (real projects) ----
   var STATIONS = [
-    {id:"ff",   title:"Forkable Factory",       tag:"FLAGSHIP LAB",   glyph:"gear",  color:"#34d399",
+    {id:"ff",   title:"Forkable Factory",       tag:"FLAGSHIP LAB",   glyph:"gear",  color:"#F26A21",
       x:1400,y:640,  url:BASE+"/forkable-factory/map",
       desc:"The thesis lab: moving physical product development from concept to manufacturing handoff with agentic workflows — probes, maps, and shipped tools."},
-    {id:"hum",  title:"The Humanoid Ledger",    tag:"RESEARCH DROP",  glyph:"robot", color:"#22d3ee",
+    {id:"hum",  title:"The Humanoid Ledger",    tag:"RESEARCH DROP",  glyph:"robot", color:"#5a96d2",
       x:2180,y:900,  url:BASE+"/humanoids",
       desc:"What's verifiably true about humanoid robots in manufacturing. 154 findings, 40 adversarially verified, every number linked to a primary source."},
     {id:"api",  title:"Manufacturing API Probe",tag:"WEEKLY LEADERBOARD",glyph:"radar",color:"#818cf8",
@@ -408,7 +414,7 @@
 
     // trail
     for(var i=0;i<trail.length;i++){var tr=trail[i];
-      ctx.globalAlpha=tr.life*0.4; ctx.fillStyle="#34d399";
+      ctx.globalAlpha=tr.life*0.4; ctx.fillStyle="#F26A21";
       ctx.beginPath(); ctx.arc(ox+tr.x,oy+tr.y,3.4*tr.life+1,0,7); ctx.fill();
     }
     ctx.globalAlpha=1;
@@ -466,10 +472,10 @@
     ctx.fillStyle="rgba(0,0,0,0.4)"; ctx.beginPath(); ctx.ellipse(0,7,22,10,0,0,7); ctx.fill();
     ctx.rotate(a);
     // body
-    ctx.fillStyle="#0f1720"; ctx.strokeStyle="#34d399"; ctx.lineWidth=2;
+    ctx.fillStyle="#0f1720"; ctx.strokeStyle="#F26A21"; ctx.lineWidth=2;
     roundRect(-16,-13,34,26,7); ctx.fill(); ctx.stroke();
     // cabin / sensor
-    ctx.fillStyle="#34d399"; roundRect(-2,-8,12,16,4); ctx.fill();
+    ctx.fillStyle="#F26A21"; roundRect(-2,-8,12,16,4); ctx.fill();
     ctx.fillStyle="#0b0b14"; ctx.beginPath(); ctx.arc(15,0,2.4,0,7); ctx.fill();
     // wheels
     ctx.fillStyle="#05060a"; roundRect(-14,-16,9,5,2); ctx.fill(); roundRect(-14,11,9,5,2); ctx.fill();
@@ -495,7 +501,7 @@
     mctx.strokeStyle="rgba(255,255,255,0.2)"; mctx.lineWidth=1.5;
     mctx.strokeRect((cam.x-W/2)*sx,(cam.y-H/2)*sy,W*sx,H*sy);
     // rover
-    mctx.fillStyle="#34d399"; mctx.beginPath(); mctx.arc(rover.x*sx,rover.y*sy,4,0,7); mctx.fill();
+    mctx.fillStyle="#F26A21"; mctx.beginPath(); mctx.arc(rover.x*sx,rover.y*sy,4,0,7); mctx.fill();
   }
 
   // ---- loop ----

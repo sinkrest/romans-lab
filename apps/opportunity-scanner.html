@@ -9,27 +9,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Opportunity Scanner</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="../codex.css">
+  <script src="../codex-boot.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Local names kept (every existing call site still works) but they are now
+       pure ALIASES of codex.css. Never give one its own literal value.
+       Each semantic hue has a fill (bars, dots, rails), a -text rung (labels)
+       and a -dim wash (chip beds) — text never sits on the solid fill. */
     :root {
-      --bg:          #0a0a0a;
-      --bg-card:     #111111;
-      --bg-card-alt: #161616;
-      --border:      #1e1e1e;
-      --border-mid:  #2a2a2a;
-      --text:        #e8e8e8;
-      --text-muted:  #666;
-      --text-dim:    #444;
-      --accent:      #5b8def;
-      --accent-glow: rgba(91,141,239,0.15);
-      --accent-dark: #3b6dcf;
-      --green:       #3ecf8e;
-      --green-dim:   rgba(62,207,142,0.12);
-      --amber:       #f5a623;
-      --amber-dim:   rgba(245,166,35,0.12);
-      --purple:      #9b7fe8;
-      --purple-dim:  rgba(155,127,232,0.12);
+      --bg:          var(--cx-paper-deep);
+      --bg-card:     var(--cx-card);
+      --bg-card-alt: var(--cx-well);
+      --border:      var(--cx-ink-faint);
+      --border-mid:  var(--cx-ink-dim);
+      --text:        var(--cx-ink);
+      --text-muted:  var(--cx-ink-soft);
+      --text-dim:    var(--cx-ink-faint-text);
+      --accent:      var(--cx-orange);         /* fills, rails, focus rings     */
+      --accent-text: var(--cx-orange-deep);    /* orange TEXT under 24px        */
+      --accent-glow: rgba(242, 106, 33, .18);  /* its wash — no token for this  */
+      --accent-dark: var(--cx-orange-deep);
+      --green:       var(--cx-accent);
+      --green-text:  var(--cx-accent-text);
+      --green-dim:   var(--cx-accent-wash);
+      --amber:       var(--cx-hype);
+      --amber-text:  var(--cx-hype-text);
+      --amber-dim:   var(--cx-hype-wash);
+      --purple:      var(--cx-brandalt);
+      --purple-text: var(--cx-brandalt-text);
+      --purple-dim:  var(--cx-brandalt-wash);
       --radius:      10px;
       --radius-sm:   6px;
       --font-sans:   -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -47,7 +57,7 @@
       padding: 28px 24px 64px;
     }
 
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--accent-text); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     .wrap {
@@ -111,13 +121,18 @@
     }
     .select {
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      /* a data: URI cannot resolve var() — the chevron is inked per theme */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c4f3d' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 10px center;
       padding-right: 28px;
       cursor: pointer;
     }
-    .select option { background: var(--bg-card); }
+    :root[data-codex=dark] .select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b5a487' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    /* native dropdown rows need an opaque bed, not the translucent card */
+    .select option { background: var(--cx-paper); color: var(--cx-ink); }
 
     /* Buttons */
     .btn {
@@ -126,13 +141,14 @@
       font-size: 13px; font-weight: 600; cursor: pointer;
       transition: all 0.15s; border: none; font-family: var(--font-sans); white-space: nowrap;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-dark); }
+    /* ink on orange — never white (white on #F26A21 is 3.06:1) */
+    .btn-primary { background: var(--accent); color: var(--cx-on-orange); }
+    .btn-primary:hover { background: var(--accent-dark); color: var(--cx-paper); }
     .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border-mid); }
     .btn-ghost:hover { background: var(--bg-card-alt); color: var(--text); }
     .btn-scan {
-      background: linear-gradient(135deg, var(--accent), #7c5cbf);
-      color: #fff; padding: 11px 24px; font-size: 14px; border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--cx-on-orange); padding: 11px 24px; font-size: 14px; border-radius: var(--radius);
     }
     .btn-scan:hover { opacity: 0.9; }
     .btn-row { display: flex; justify-content: flex-end; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); gap: 8px; }
@@ -150,7 +166,7 @@
     }
     .scan-ring-2 { animation-delay: 0.9s; }
     @keyframes scan-pulse { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
-    .scan-icon { font-size: 22px; color: var(--accent); z-index: 1; animation: icon-pulse 1.8s ease-in-out infinite; }
+    .scan-icon { font-size: 22px; color: var(--accent-text); z-index: 1; animation: icon-pulse 1.8s ease-in-out infinite; }
     @keyframes icon-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     .loading-text { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .loading-text span { font-size: 14px; font-weight: 500; color: var(--text); }
@@ -158,7 +174,7 @@
 
     /* Results */
     .results-hdr { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-    .results-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 4px; }
+    .results-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-text); margin-bottom: 4px; }
     .results-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
     .results-actions { display: flex; gap: 6px; flex-shrink: 0; margin-top: 2px; }
 
@@ -169,10 +185,11 @@
       padding: 4px 9px; border-radius: var(--radius-sm);
       font-size: 11px; font-weight: 600; border: 1px solid transparent;
     }
-    .badge-green { background: var(--green-dim); border-color: rgba(62,207,142,0.2); color: var(--green); }
-    .badge-amber { background: var(--amber-dim); border-color: rgba(245,166,35,0.2); color: var(--amber); }
-    .badge-purple { background: var(--purple-dim); border-color: rgba(155,127,232,0.2); color: var(--purple); }
-    .badge-blue { background: var(--accent-glow); border-color: rgba(91,141,239,0.25); color: var(--accent); }
+    /* label on the wash, fill as the border — text never sits on a solid fill */
+    .badge-green  { background: var(--green-dim);  border-color: var(--green);  color: var(--green-text); }
+    .badge-amber  { background: var(--amber-dim);  border-color: var(--amber);  color: var(--amber-text); }
+    .badge-purple { background: var(--purple-dim); border-color: var(--purple); color: var(--purple-text); }
+    .badge-blue   { background: var(--accent-glow); border-color: var(--accent); color: var(--accent-text); }
 
     /* Tier */
     .tier-label {
@@ -209,24 +226,24 @@
     .opp-tools { display: flex; flex-wrap: wrap; gap: 4px; }
     .tool-tag {
       font-size: 10px; padding: 2px 6px;
-      background: var(--accent-glow); border: 1px solid rgba(91,141,239,0.2);
-      border-radius: 4px; color: var(--accent); font-family: var(--font-mono);
+      background: var(--accent-glow); border: 1px solid var(--accent);
+      border-radius: 4px; color: var(--accent-text); font-family: var(--font-mono);
     }
 
     /* Brief */
     .brief-hdr { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; }
     .output-content { font-size: 13px; line-height: 1.8; }
     .output-content h2 { font-size: 16px; font-weight: 700; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    .output-content h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin: 16px 0 6px; }
+    .output-content h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent-text); margin: 16px 0 6px; }
     .output-content p { margin-bottom: 8px; }
     .output-content ul, .output-content ol { padding-left: 18px; margin-bottom: 10px; }
     .output-content li { margin-bottom: 3px; }
     .output-content table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 12px; }
     .output-content th { background: var(--bg-card-alt); color: var(--text-muted); font-weight: 600; text-align: left; padding: 6px 9px; border: 1px solid var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
     .output-content td { padding: 6px 9px; border: 1px solid var(--border); vertical-align: top; }
-    .output-content tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .output-content tr:nth-child(even) td { background: rgba(var(--cx-ink-rgb), 0.04); }
     .output-content strong { font-weight: 600; }
-    .output-content code { background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+    .output-content code { background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; font-family: var(--font-mono); font-size: 11px; color: var(--accent-text); }
 
     .output-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 8px; }
     .output-link { font-size: 12px; color: var(--text-dim); }
@@ -346,6 +363,15 @@
 
 <script>
 const API = 'https://ai-opportunity-scanner.vercel.app/api/claude';
+
+/* Colours written into inline styles cannot be var() — they are read from the
+   codex tokens here instead (cxToken comes from codex-boot.js). These tint
+   small pill labels, so they use the -text rung, never the bare fill. */
+const cx = (name, fallback) => (window.cxToken ? window.cxToken(name, fallback) : fallback);
+const CX_GOOD  = cx('--cx-accent-text', '#1c674a');
+const CX_WARN  = cx('--cx-hype-text',   '#7a5606');
+const CX_BAD   = cx('--cx-danger-text', '#a32d2d');
+const CX_MUTED = cx('--cx-ink-soft',    '#5c4f3d');
 
 const $ = id => document.getElementById(id);
 const inputSection   = $('input-section');
@@ -504,8 +530,8 @@ function mkTier(label, cls) {
 function mkCard(o, rank, cls) {
   const c = document.createElement('div');
   c.className = `opp-card ${cls}`;
-  const ic = { High:'#3ecf8e', Medium:'#f5a623', Low:'#666' };
-  const ec = { Low:'#3ecf8e', Medium:'#f5a623', High:'#e05a5a' };
+  const ic = { High:CX_GOOD, Medium:CX_WARN, Low:CX_MUTED };
+  const ec = { Low:CX_GOOD, Medium:CX_WARN, High:CX_BAD };
   const tools = Array.isArray(o.tools) ? o.tools.slice(0,4).map(t=>`<span class="tool-tag">${esc(t)}</span>`).join('') : '';
   c.innerHTML = `
     <div class="opp-hdr">
@@ -516,8 +542,8 @@ function mkCard(o, rank, cls) {
       <div class="opp-rank">#${rank}</div>
     </div>
     <div class="opp-meta">
-      <span class="opp-pill"><span class="pill-lbl">Impact</span> <span style="color:${ic[o.impact]||'#666'};font-weight:700">${esc(o.impact)}</span></span>
-      <span class="opp-pill"><span class="pill-lbl">Effort</span> <span style="color:${ec[o.effort]||'#666'};font-weight:700">${esc(o.effort)}</span></span>
+      <span class="opp-pill"><span class="pill-lbl">Impact</span> <span style="color:${ic[o.impact]||CX_MUTED};font-weight:700">${esc(o.impact)}</span></span>
+      <span class="opp-pill"><span class="pill-lbl">Effort</span> <span style="color:${ec[o.effort]||CX_MUTED};font-weight:700">${esc(o.effort)}</span></span>
       <span class="opp-pill"><span class="pill-lbl">Time to value</span> ${esc(o.time_to_value)}</span>
       <span class="opp-pill">${esc(o.ai_type)}</span>
     </div>

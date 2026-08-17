@@ -62,7 +62,12 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
+      /* the codex canvas — same ruled blueprint grid + parchment gradient as
+         romanmartins.com, so the two properties read as one surface */
+      background:
+        repeating-linear-gradient(0deg, transparent 0 31px, var(--cx-ink-faint) 31px 32px),
+        repeating-linear-gradient(90deg, transparent 0 31px, var(--cx-ink-faint) 31px 32px),
+        radial-gradient(ellipse at 30% 20%, var(--cx-glow) 0%, var(--cx-paper) 55%, var(--cx-paper-deep) 100%);
       color: var(--text);
       height: 100dvh;
       display: flex;
@@ -697,22 +702,15 @@
       <a class="card ff-card" href="https://romanmartins.com/manufacturing-apis" target="_blank" rel="noopener noreferrer">
         <div class="icon">🏭</div>
         <h2>State of Manufacturing APIs</h2>
-        <p>Can an agent get a part quoted and ordered without a human? Weekly leaderboard scoring Xometry, Protolabs, Hubs + 4 more on 8 agent-readiness dimensions. Open methodology, RSS changelog.</p>
-        <span class="tag">Weekly probe · Leaderboard ↗</span>
+        <p>A 100-point rubric across 8 dimensions, run against 7 vendors and republished every time it runs, so the scores can be argued with. Open methodology, full history, RSS changelog.</p>
+        <span class="tag">Probe · last run 30 Jun 2026 ↗</span>
       </a>
 
       <a class="card ff-card" href="https://romanmartins.com/cad-agents" target="_blank" rel="noopener noreferrer">
         <div class="icon">📐</div>
         <h2>State of Agent CAD</h2>
-        <p>Which AI CAD tools can an agent actually drive? 8 vendors – Adam, Zoo.dev, Onshape + more – scored weekly on agent-readiness. A reference board for the agent-CAD space.</p>
-        <span class="tag">Weekly probe ↗</span>
-      </a>
-
-      <a class="card ff-card" href="https://romanmartins.com/agent-buildable-index" target="_blank" rel="noopener noreferrer">
-        <div class="icon">🔬</div>
-        <h2>Agent-Buildable Index</h2>
-        <p>How much of a real hardware product can agents build today? 5 products scored end-to-end across 7 dimensions – spec, CAD, PCB, BOM, manufacturing handoff, firmware, compliance. Every point requires evidence.</p>
-        <span class="tag">Flagship research ↗</span>
+        <p>The same rubric machinery pointed at a second vendor set: which AI CAD tools an agent can actually drive, scored on the same 8 dimensions.</p>
+        <span class="tag">Probe · last run 15 Jun 2026 ↗</span>
       </a>
 
       <a class="card ff-card" href="https://romanmartins.com/forkable-factory/photo-to-print" target="_blank" rel="noopener noreferrer">
@@ -742,33 +740,33 @@
         <span class="suite-header-count" style="color: var(--cx-info-text); background: rgba(43,127,190,0.08); border-color: rgba(43,127,190,0.22);">5 tools</span>
       </div>
 
-      <div class="card mfg-card" onclick="openApp('https://compliance-navigator-pearl.vercel.app', '🛡 Compliance Navigator')">
+      <a class="card mfg-card" href="https://compliance-navigator-pearl.vercel.app" onclick="return openApp(event, 'https://compliance-navigator-pearl.vercel.app', '🛡 Compliance Navigator')">
         <div class="icon">🛡</div>
         <h2>Compliance Navigator</h2>
         <p>Describe your hardware product, get the EU directives that apply, a compliance checklist with cost estimates, and risk intel from 9,742 real product recalls.</p>
         <span class="tag" style="background:rgba(43,127,190,0.08);color:var(--cx-info-text);border-color:rgba(43,127,190,0.22);">Forkable Factory · Open Data</span>
-      </div>
+      </a>
 
-      <div class="card mfg-card" onclick="openApp('https://partcost.vercel.app', '$ Part-Cost Estimator')">
+      <a class="card mfg-card" href="https://partcost.vercel.app" onclick="return openApp(event, 'https://partcost.vercel.app', '$ Part-Cost Estimator')">
         <div class="icon">$</div>
         <h2>Part-Cost Estimator</h2>
         <p>Upload a 2D drawing or enter specs. Get a detailed part-cost model with cost breakdown, quantity curves, DFM cost drivers, and quote red flags — powered by Claude vision.</p>
         <span class="tag" style="background:rgba(43,127,190,0.08);color:var(--cx-info-text);border-color:rgba(43,127,190,0.22);">Claude Vision · Drawing Upload</span>
-      </div>
+      </a>
 
-      <div class="card mfg-card" onclick="openApp('apps/toolkit.html', '🛠️ PD Toolkit')">
+      <a class="card mfg-card" href="apps/toolkit.html" onclick="return openApp(event, 'apps/toolkit.html', '🛠️ PD Toolkit')">
         <div class="icon">🛠️</div>
         <h2>PD Toolkit</h2>
         <p>Interactive decision tools for product development — Stage-Gate Checker, FMEA Calculator, Make vs Buy Matrix, Cycle Time Estimator.</p>
         <span class="tag" style="background:rgba(43,127,190,0.08);color:var(--cx-info-text);border-color:rgba(43,127,190,0.22);">Tools</span>
-      </div>
+      </a>
 
-      <div class="card mfg-card" onclick="openApp('https://uptime-calculator-lime.vercel.app', 'Downtime Cost Calculator')">
+      <a class="card mfg-card" href="https://uptime-calculator-lime.vercel.app" onclick="return openApp(event, 'https://uptime-calculator-lime.vercel.app', 'Downtime Cost Calculator')">
         <div class="icon">⏱</div>
         <h2>Downtime Cost Calculator</h2>
         <p>Input your revenue and incident data — see cost-per-minute of downtime, annual risk exposure, and monitoring ROI breakdown with AI executive insight.</p>
         <span class="tag" style="background:rgba(43,127,190,0.08);color:var(--cx-info-text);border-color:rgba(43,127,190,0.22);">Live AI Tool</span>
-      </div>
+      </a>
 
       <a class="card mfg-card" href="https://made-on-bornholm.vercel.app" target="_blank" rel="noopener noreferrer">
         <div class="icon">🏝</div>
@@ -790,68 +788,68 @@
         <span class="tag">✦ New · Live Camera Demo ↗</span>
       </a>
 
-      <div class="card" onclick="openApp('https://ask-portfolio-liard.vercel.app', '💬 Ask My Portfolio — Jarvi')">
+      <a class="card" href="https://ask-portfolio-liard.vercel.app" onclick="return openApp(event, 'https://ask-portfolio-liard.vercel.app', '💬 Ask My Portfolio — Jarvi')">
         <div class="icon">💬</div>
         <h2>Ask My Portfolio</h2>
         <p>Ask Jarvi anything about Roman's work – skills, projects, case studies – and get cited answers from a curated knowledge base. Powered by Claude.</p>
         <span class="tag">✦ RAG · Live AI</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://romanmartins.com/feed', 'The Wire — AI Code Intelligence')">
+      <a class="card" href="https://romanmartins.com/feed" onclick="return openApp(event, 'https://romanmartins.com/feed', 'The Wire — AI Code Intelligence')">
         <div class="icon">⚡</div>
         <h2>The Wire</h2>
         <p>Where are the product opportunities in AI coding tools? Screens Claude Code and OpenClaw daily — surfacing gaps, pain points, and emerging patterns a PM would act on.</p>
         <span class="tag">✦ Live · Product Opportunity Radar</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://flow-doctor-kestra.vercel.app', '🩺 Flow Doctor')">
+      <a class="card" href="https://flow-doctor-kestra.vercel.app" onclick="return openApp(event, 'https://flow-doctor-kestra.vercel.app', '🩺 Flow Doctor')">
         <div class="icon">🩺</div>
         <h2>Flow Doctor</h2>
         <p>Paste a Kestra flow's YAML, get a 0–100 reliability scorecard with cited one-line fixes – failure handling, observability, scale risk, guardrails. 100% client-side.</p>
         <span class="tag">✦ New · Live Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://ai-scoping-tool.vercel.app', '◳ AI Scoping Tool')">
+      <a class="card" href="https://ai-scoping-tool.vercel.app" onclick="return openApp(event, 'https://ai-scoping-tool.vercel.app', '◳ AI Scoping Tool')">
         <div class="icon">◳</div>
         <h2>AI Scoping Tool</h2>
         <p>Describe a business problem. Short discovery questions turn it into a structured AI scoping document you can act on – approach, effort, and risks.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://ai-discovery-simulator.vercel.app', '⧉ AI Discovery Simulator')">
+      <a class="card" href="https://ai-discovery-simulator.vercel.app" onclick="return openApp(event, 'https://ai-discovery-simulator.vercel.app', '⧉ AI Discovery Simulator')">
         <div class="icon">⧉</div>
         <h2>AI Discovery Simulator</h2>
         <p>Validate a product idea in four phases – synthetic personas, simulated discovery interviews, and a synthesized Opportunity Brief at the end.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://ai-pm-archetype.vercel.app', 'AI PM Archetype Test')">
+      <a class="card" href="https://ai-pm-archetype.vercel.app" onclick="return openApp(event, 'https://ai-pm-archetype.vercel.app', 'AI PM Archetype Test')">
         <div class="icon">◑</div>
         <h2>AI PM Archetype Test</h2>
         <p>10 questions. Find out whether you're a Builder, Architect, Translator, or Guardian — and get an honest read on how you think about AI product work.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://stakeholder-lens.vercel.app', 'Stakeholder Lens')">
+      <a class="card" href="https://stakeholder-lens.vercel.app" onclick="return openApp(event, 'https://stakeholder-lens.vercel.app', 'Stakeholder Lens')">
         <div class="icon">🔭</div>
         <h2>Stakeholder Lens</h2>
         <p>Paste your roadmap once. Get four audience-specific views — engineering, sales, exec, and customers — generated in seconds by Claude AI.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('https://ghost-discovery-tree.vercel.app', 'Discovery Tree Experiment')">
+      <a class="card" href="https://ghost-discovery-tree.vercel.app" onclick="return openApp(event, 'https://ghost-discovery-tree.vercel.app', 'Discovery Tree Experiment')">
         <div class="icon">🌳</div>
         <h2>Discovery Tree Experiment</h2>
         <p>Interactive Opportunity Solution Tree — Teresa Torres framework. Map outcomes to opportunities, solutions, and experiments. Score, prioritize, and generate an AI discovery brief.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('apps/opportunity-scanner.html', '◈ AI Opportunity Scanner')">
+      <a class="card" href="apps/opportunity-scanner.html" onclick="return openApp(event, 'apps/opportunity-scanner.html', '◈ AI Opportunity Scanner')">
         <div class="icon">◈</div>
         <h2>AI Opportunity Scanner</h2>
         <p>Describe your company. Get a ranked map of AI opportunities — Quick Wins vs Strategic Bets, with effort, impact, time to value, and tool recommendations.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
       <!-- Publishing Suite -->
       <div class="suite-header">
@@ -862,87 +860,87 @@
         Built in a weekend — 6 tools, live APIs, real data.
       </div>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-pm-signal.vercel.app', 'Product Signal')">
+      <a class="card ghost-card" href="https://ghost-pm-signal.vercel.app" onclick="return openApp(event, 'https://ghost-pm-signal.vercel.app', 'Product Signal')">
         <div class="icon">⬡</div>
         <h2>Product Signal</h2>
         <p>Live PM intelligence — forum feature votes, GitHub issues, community signals, Reddit, HN, and competitor moves synthesised by Claude into a weekly PM decision brief.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-creator-journey.vercel.app', 'Creator Journey Map')">
+      <a class="card ghost-card" href="https://ghost-creator-journey.vercel.app" onclick="return openApp(event, 'https://ghost-creator-journey.vercel.app', 'Creator Journey Map')">
         <div class="icon">◎</div>
         <h2>Creator Journey Map</h2>
         <p>A PM lens on the creator lifecycle — where the product helps, where it creates friction, and where the highest-leverage gaps live. Mapped to real community signals.</p>
         <span class="tag">PM Research</span>
-      </div>
+      </a>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-strategy-radar.vercel.app', 'Strategy Radar')">
+      <a class="card ghost-card" href="https://ghost-strategy-radar.vercel.app" onclick="return openApp(event, 'https://ghost-strategy-radar.vercel.app', 'Strategy Radar')">
         <div class="icon">◉</div>
         <h2>Strategy Radar</h2>
         <p>Interactive hexagonal radar mapping 6 strategic pillars. Scored on maturity, momentum, community demand, and competitive parity. Claude generates a strategic brief on biggest gaps and next bets.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-intel-five.vercel.app', 'Competitive Intel')">
+      <a class="card ghost-card" href="https://ghost-intel-five.vercel.app" onclick="return openApp(event, 'https://ghost-intel-five.vercel.app', 'Competitive Intel')">
         <div class="icon">◎</div>
         <h2>Competitive Intel</h2>
         <p>Live platform dashboard — latest releases, changelog, blog posts, dev activity, and an AI-generated digest. Know what the competition is shipping, right now.</p>
         <span class="tag">✦ Live Data</span>
-      </div>
+      </a>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-repurpose.vercel.app', 'Content Repurpose')">
+      <a class="card ghost-card" href="https://ghost-repurpose.vercel.app" onclick="return openApp(event, 'https://ghost-repurpose.vercel.app', 'Content Repurpose')">
         <div class="icon">✦</div>
         <h2>Content Repurpose</h2>
         <p>Paste your newsletter. Get a Twitter thread, LinkedIn post, podcast show notes, re-engagement email, and a key takeaway — all in your voice.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
-      <div class="card ghost-card" onclick="openApp('https://ghost-creator-advisor.vercel.app', 'Content Advisor')">
+      <a class="card ghost-card" href="https://ghost-creator-advisor.vercel.app" onclick="return openApp(event, 'https://ghost-creator-advisor.vercel.app', 'Content Advisor')">
         <div class="icon">📊</div>
         <h2>Content Advisor</h2>
         <p>Enter your publication metrics. Get a clear diagnosis of your media business — creator stage, biggest lever, and your top 3 recommendations.</p>
         <span class="tag">✦ Live AI Tool</span>
-      </div>
+      </a>
 
       <!-- Arcade -->
       <div class="suite-divider">
         <span class="suite-divider-label">Arcade</span>
       </div>
 
-      <div class="card" onclick="openApp('drive.html', '🏭 Factory Floor')">
+      <a class="card" href="drive.html" onclick="return openApp(event, 'drive.html', '🏭 Factory Floor')">
         <div class="icon">🏭</div>
         <h2>Factory Floor</h2>
         <p>My portfolio, as a driving game — an homage to bruno-simon.com. Steer an autonomous factory rover around the floor and roll into any station to open the real project. WASD to drive.</p>
         <span class="tag">Driving Portfolio</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('orbit.html', '🌌 Orbit')">
+      <a class="card" href="orbit.html" onclick="return openApp(event, 'orbit.html', '🌌 Orbit')">
         <div class="icon">🌌</div>
         <h2>Orbit</h2>
         <p>Gravitational sandbox. Slingshot planets around a star — watch them orbit, merge, and paint trails across space. Real physics. Pure beauty.</p>
         <span class="tag">Physics Sandbox</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('flappy.html', '🐤 Ship It Bird')">
+      <a class="card" href="flappy.html" onclick="return openApp(event, 'flappy.html', '🐤 Ship It Bird')">
         <div class="icon">🐤</div>
         <h2>Ship It Bird</h2>
         <p>Navigate the deployment pipeline. Dodge the pipes. Ship features. Combo streaks, milestone messages, and a high score that persists. The PM's Flappy Bird.</p>
         <span class="tag">Game</span>
-      </div>
+      </a>
 
-      <div class="card" onclick="openApp('snake.html', '🐍 Snake \'99')">
+      <div class="card" onclick="return openApp(event, 'snake.html', '🐍 Snake \'99')">
         <div class="icon">🐍</div>
         <h2>Snake '99</h2>
         <p>The Nokia classic reborn. Green LCD screen, pixel-perfect apples, wall-wrapping physics, 5 difficulty levels. Pure nostalgic gameplay.</p>
         <span class="tag">Game</span>
       </div>
 
-      <div class="card" onclick="openApp('tetris.html', '🧱 Sprint Blocks')">
+      <a class="card" href="tetris.html" onclick="return openApp(event, 'tetris.html', '🧱 Sprint Blocks')">
         <div class="icon">🧱</div>
         <h2>Sprint Blocks</h2>
         <p>Stack features. Clear sprints. Ship product. A Tetris game for product people — with ghost pieces, hold queue, combos, and 10 levels from MVP to God Mode.</p>
         <span class="tag">Game</span>
-      </div>
+      </a>
 
     </div>
 
@@ -953,7 +951,7 @@
         <div class="hero-cta">
           <a class="btn btn-primary" href="mailto:roman@romanmartins.com">✉ roman@romanmartins.com</a>
           <a class="btn btn-ghost" href="https://www.linkedin.com/in/romanmartins" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-          <button class="btn btn-ghost" onclick="openApp('https://ask-portfolio-liard.vercel.app', '💬 Ask My Portfolio — Jarvi')">💬 Ask Jarvi about my work</button>
+          <button class="btn btn-ghost" onclick="return openApp(event, 'https://ask-portfolio-liard.vercel.app', '💬 Ask My Portfolio — Jarvi')">💬 Ask Jarvi about my work</button>
         </div>
       </div>
     </div>
@@ -1006,7 +1004,15 @@
   }
 
   function switchTab(name) { showPanel('panel-' + name, '🐍 Snake'); }
-  function openApp(src, title) { appFrame.src = src; showPanel('panel-app', title); }
+  function openApp(ev, src, title) {
+    // Cards are real <a href> now. Only intercept a plain left click so that
+    // cmd/ctrl/shift/middle-click and "open in new tab" behave natively — a
+    // recruiter opening five tools into tabs used to get nothing at all.
+    if (ev && (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button === 1)) return true;
+    if (ev && ev.preventDefault) ev.preventDefault();
+    appFrame.src = src; showPanel('panel-app', title);
+    return false;
+  }
 
   homeBtn.addEventListener('click', () => showPanel('panel-home', ''));
 </script>

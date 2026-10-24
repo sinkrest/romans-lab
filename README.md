@@ -38,11 +38,6 @@ Track AI token consumption, model usage, and execution history across Claude and
 ### 🏭 Product Pipeline
 A strategy game where you navigate a product through development stages — collect milestones, dodge scope creep, ship before budget runs out.
 
-### ⬡ AI Scoping Tool — Live AI Tool
-Describe a business problem. Answer 3 discovery questions. Get a structured AI implementation plan — recommended AI approach, process automation breakdown, effort vs. impact, phased rollout, risks, and success metrics. Powered by Claude API.
-
-**[Live demo →](https://sinkrest.github.io/ai-scoping-tool)**
-
 ### 📬 The Industrial Edge
 Newsletter landing page for Industrial Product Development Managers — AI, smart manufacturing, and product strategy.
 
